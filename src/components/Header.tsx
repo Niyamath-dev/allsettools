@@ -239,10 +239,8 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          <Link href="/blog" className="nav-item" style={{ border: 'none' }}>Blog</Link>
           <Link href="/about" className="nav-item" style={{ border: 'none' }}>About</Link>
           <Link href="/contact" className="nav-item" style={{ border: 'none' }}>Contact</Link>
-          <Link href="/admin" className="nav-item" style={{ border: 'none' }}>Admin</Link>
 
 
 
@@ -346,10 +344,8 @@ export const Header: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
-            <Link href="/blog" onClick={() => setMenuOpen(false)} style={{ fontSize: '1rem', fontWeight: 600 }}>Blog Tutorials</Link>
             <Link href="/about" onClick={() => setMenuOpen(false)} style={{ fontSize: '1rem', fontWeight: 600 }}>About Us</Link>
             <Link href="/contact" onClick={() => setMenuOpen(false)} style={{ fontSize: '1rem', fontWeight: 600 }}>Contact Us</Link>
-            <Link href="/admin" onClick={() => setMenuOpen(false)} style={{ fontSize: '1rem', fontWeight: 600 }}>Admin Console</Link>
           </div>
 
           {/* Toggle buttons inside drawer */}

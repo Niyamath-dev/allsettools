@@ -4,7 +4,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { TOOLS, CATEGORIES } from '@/lib/registry';
-import { BLOG_POSTS } from '@/lib/blog';
 import { Icon } from '@/components/Icons';
 import { toast } from '@/components/Toast';
 
@@ -215,6 +214,46 @@ export default function Home() {
             </div>
           )}
           <hr style={{ borderColor: 'var(--color-border)', margin: '4rem 0 2rem 0' }} />
+        </section>
+      )}
+
+      {/* FAVORITES SECTION */}
+      {searchQuery.trim() === '' && favorites.length > 0 && (
+        <section style={{ marginBottom: '5.5rem' }} className="animate-fade-in">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px', border: 'none', padding: 0, margin: 0 }}>
+              <Icon name="tag" style={{ width: '20px', height: '20px', fill: 'var(--color-primary)', color: 'var(--color-primary)' }} />
+              Your Starred Favorites ({favoriteTools.length})
+            </h2>
+            <button
+              onClick={() => {
+                setFavorites([]);
+                localStorage.setItem('allsettools_favorites', JSON.stringify([]));
+                toast.show('Cleared all favorites', 'info');
+              }}
+              style={{ background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.8125rem', cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              Clear All
+            </button>
+          </div>
+          <div className="grid-cols-4">
+            {favoriteTools.map(tool => (
+              <Link href={`/tools/${tool.id}`} key={tool.id} className="card card-hover" style={{ padding: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                  <Icon name={tool.icon} className="tool-card-icon" style={{ width: '18px', height: '18px' }} />
+                  <button
+                    onClick={(e) => toggleFavorite(tool.id, e)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary)' }}
+                    aria-label="Remove from favorites"
+                  >
+                    <Icon name="tag" style={{ width: '13px', height: '13px', fill: 'currentColor' }} />
+                  </button>
+                </div>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.25rem' }}>{tool.name}</h3>
+                <p style={{ fontSize: '0.75rem', flex: 1, lineHeight: '1.4' }}>{tool.description}</p>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
 
@@ -523,13 +562,13 @@ export default function Home() {
         </section>
       )}
 
-      {/* 10. FAQ & BLOG SECTION */}
+      {/* 10. FAQ SECTION */}
       {searchQuery.trim() === '' && (
-        <div className="grid-cols-2" style={{ gap: '3rem', borderTop: '1px solid var(--color-border)', paddingTop: '3.5rem', marginBottom: '3rem' }}>
+        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '3.5rem', marginBottom: '3rem', maxWidth: '800px', margin: '0 auto' }}>
 
           {/* FAQ Accordions */}
           <div>
-            <h2 style={{ fontSize: '1.35rem', marginBottom: '1.5rem', border: 'none', padding: 0 }}>Frequently Asked Questions</h2>
+            <h2 style={{ fontSize: '1.35rem', marginBottom: '1.5rem', border: 'none', padding: 0, textAlign: 'center' }}>Frequently Asked Questions</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {faqs.map((faq, idx) => {
                 const isOpen = activeFaq === idx;
@@ -576,23 +615,6 @@ export default function Home() {
                   </div>
                 );
               })}
-            </div>
-          </div>
-
-          {/* Blog Feed summaries */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.35rem', border: 'none', padding: 0, margin: 0 }}>Latest Articles</h2>
-              <Link href="/blog" style={{ fontSize: '0.8125rem', color: 'var(--color-fg-muted)', textDecoration: 'underline' }}>View All</Link>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {BLOG_POSTS.slice(0, 2).map(post => (
-                <Link href={`/blog/${post.slug}`} key={post.slug} className="card card-hover" style={{ padding: '1.25rem' }}>
-                  <span style={{ fontSize: '0.65rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', color: 'var(--color-fg-dimmed)' }}>{post.category}</span>
-                  <h4 style={{ fontSize: '0.95rem', fontWeight: 600, marginTop: '0.25rem', border: 'none', padding: 0 }}>{post.title}</h4>
-                  <p style={{ fontSize: '0.75rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '0.25rem 0' }}>{post.excerpt}</p>
-                </Link>
-              ))}
             </div>
           </div>
 

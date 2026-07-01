@@ -1,13 +1,12 @@
 // src/app/sitemap.ts
 import { MetadataRoute } from 'next';
 import { TOOLS, CATEGORIES } from '@/lib/registry';
-import { BLOG_POSTS } from '@/lib/blog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://allsettools.dev';
 
   // Core pages
-  const corePages = ['', '/blog', '/admin', '/feedback', '/about', '/contact', '/tools'].map((path) => ({
+  const corePages = ['', '/admin', '/feedback', '/about', '/contact', '/tools'].map((path) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
@@ -30,13 +29,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  // Static blog pages
-  const blogPages = BLOG_POSTS.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.5,
-  }));
-
-  return [...corePages, ...categoryPages, ...toolPages, ...blogPages];
+  return [...corePages, ...categoryPages, ...toolPages];
 }

@@ -45,7 +45,7 @@ export const Footer: React.FC = () => {
                 <Link href="/tools/json-formatter" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>JSON Formatter</Link>
               </li>
               <li>
-                <Link href="/tools/base64-encoder" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>Base64 Encoder</Link>
+                <Link href="/tools/base64-encode-decode" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>Base64 Encoder</Link>
               </li>
               <li>
                 <Link href="/tools/image-compressor" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>Image Compressor</Link>
@@ -87,16 +87,10 @@ export const Footer: React.FC = () => {
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <li>
-                <Link href="/blog" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>Blog Tutorials</Link>
-              </li>
-              <li>
                 <Link href="/about" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>About Us</Link>
               </li>
               <li>
                 <Link href="/contact" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>Contact Support</Link>
-              </li>
-              <li>
-                <Link href="/admin" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>Admin Console</Link>
               </li>
               <li>
                 <Link href="/tools" style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', transition: 'color var(--transition-fast)' }}>All Tools Directory</Link>
