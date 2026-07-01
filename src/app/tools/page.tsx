@@ -24,7 +24,7 @@ export default function CategoriesIndexPage() {
           Tools Directories
         </h1>
         <p style={{ fontSize: '1.125rem', color: 'var(--color-fg-muted)', maxWidth: '600px' }}>
-          Explore our collection of 130+ offline-ready client-side utilities organized by category.
+          Explore our collection of 200+ offline-ready client-side utilities organized by category.
         </p>
       </div>
 

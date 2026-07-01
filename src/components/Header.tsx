@@ -137,7 +137,7 @@ export const Header: React.FC = () => {
             </button>
 
             {megaOpen && (
-              <div 
+              <div
                 style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9998, cursor: 'default' }}
                 onClick={() => setMegaOpen(false)}
               />
@@ -213,7 +213,7 @@ export const Header: React.FC = () => {
                       <div className="mega-menu-footer">
                         <span className="mega-menu-footer-text d-flex align-items-center gap-2">
                           <span className="badge bg-success rounded-pill">Free</span>
-                          130+ client-side tools · no signup
+                          200+ client-side tools · no signup
                         </span>
                         <Link href="/tools" className="mega-menu-footer-link btn btn-sm btn-primary" onClick={() => setMegaOpen(false)}>
                           View All Tools →

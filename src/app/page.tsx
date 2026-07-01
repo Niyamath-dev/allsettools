@@ -137,7 +137,7 @@ export default function Home() {
           Secure browser-local utility workspace for developers.
         </h1>
         <p className="hero-desc">
-          AllSetTools delivers 130+ formatting, compression, decoding, and calculating tools. 100% offline-ready, running directly on your CPU.
+          AllSetTools delivers 200+ formatting, compression, decoding, and calculating tools. 100% offline-ready, running directly on your CPU.
         </p>
 
         {/* Search Bar Input */}
@@ -149,7 +149,7 @@ export default function Home() {
         }}>
           <input
             type="text"
-            placeholder="Search 130+ tools (e.g. JSON formatter, Base64, Image crop)..."
+            placeholder="Search 200+ tools (e.g. JSON formatter, Base64, Image crop)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input"
@@ -379,7 +379,7 @@ export default function Home() {
         <section style={{ marginBottom: '5.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '3.5rem' }}>
           <div className="grid-cols-4" style={{ textAlign: 'center' }}>
             <div style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', color: 'var(--color-fg)', fontFamily: 'var(--font-mono)' }}>130+</div>
+              <div style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', color: 'var(--color-fg)', fontFamily: 'var(--font-mono)' }}>200+</div>
               <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', marginTop: '4px' }}>Free Local Utilities</p>
             </div>
             <div style={{ padding: '1.5rem' }}>
@@ -410,7 +410,7 @@ export default function Home() {
               <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-mono)', color: 'var(--color-fg-dimmed)' }}>01</div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>Select a Utility</h3>
               <p style={{ fontSize: '0.8125rem', lineHeight: '1.5' }}>
-                Choose from 130+ developer formatters, hash generators, calculations sheets, or image compressors in our workspace.
+                Choose from 200+ developer formatters, hash generators, calculations sheets, or image compressors in our workspace.
               </p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

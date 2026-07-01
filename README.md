@@ -1,6 +1,6 @@
 # ToolHub - Free All-in-One Online Web Tools Platform
 
-ToolHub is a modern, premium, high-performance web utility workspace featuring **130+ developer, text, design, and financial tools** running entirely client-side in the browser. 
+ToolHub is a modern, premium, high-performance web utility workspace featuring **200+ developer, text, design, and financial tools** running entirely client-side in the browser. 
 
 The user interface follows a strict black-and-white minimalist SaaS aesthetic inspired by Vercel, Linear, and Notion.
 
@@ -40,7 +40,7 @@ toolhub/
 │   │   └── Toast.tsx         # Notification alerts
 │   └── lib/
 │       ├── blog.ts           # Precompiled articles list database
-│       └── registry.ts       # Central 130+ tools index catalog mappings
+│       └── registry.ts       # Central 200+ tools index catalog mappings
 ```
 
 ---
