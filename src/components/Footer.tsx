@@ -30,6 +30,64 @@ export const Footer: React.FC = () => {
   return (
     <footer className="footer animate-fade-in">
       <div className="container">
+        {/* Support Banner / Buy me a coffee */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          padding: '1.25rem 2rem',
+          backgroundColor: 'var(--color-bg-card)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: '2.5rem',
+          boxShadow: 'var(--shadow-sm)'
+        }} className="support-banner">
+          <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-fg)' }}>
+            Want to support?
+          </span>
+          <a
+            href="https://buymeacoffee.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: '#ffdd00',
+              color: '#000000',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              padding: '8px 16px',
+              borderRadius: 'var(--radius-md)',
+              textDecoration: 'none',
+              transition: 'all var(--transition-fast)',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}
+            className="bmc-btn"
+          >
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              style={{ marginRight: '2px' }}
+            >
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+              <line x1="6" y1="1" x2="6" y2="4" />
+              <line x1="10" y1="1" x2="10" y2="4" />
+              <line x1="14" y1="1" x2="14" y2="4" />
+            </svg>
+            Buy me a coffee
+          </a>
+        </div>
+
         <div className="footer-grid">
           {/* Brand Column */}
           <div className="footer-brand">
@@ -42,9 +100,6 @@ export const Footer: React.FC = () => {
             <div style={{ marginTop: '0.5rem', display: 'flex', gap: '8px' }}>
               <Link href="/feedback" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.75rem', borderRadius: 'var(--radius-sm)' }}>
                 Feedback
-              </Link>
-              <Link href="/donate" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.75rem', borderRadius: 'var(--radius-sm)' }}>
-                Donate
               </Link>
             </div>
           </div>
