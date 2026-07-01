@@ -1041,3 +1041,8 @@ pre {
   font-weight: 600;
   border-left-color: var(--color-primary);
 }
+
+/* Dark mode styling helper for logo PNG text legibility */
+[data-theme="dark"] .logo-img {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+}
