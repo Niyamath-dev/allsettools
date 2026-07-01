@@ -67,7 +67,7 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <Header />
-        <main style={{ flex: 1, paddingTop: '2rem', paddingBottom: '4rem' }}>
+        <main style={{ flex: 1, paddingTop: 'calc(64px + 2rem)', paddingBottom: '4rem' }}>
           {children}
         </main>
         <Footer />

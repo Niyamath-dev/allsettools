@@ -39,10 +39,10 @@ export const CommandPalette: React.FC = () => {
   const filteredTools = query.trim() === ''
     ? TOOLS.slice(0, 8) // Show first 8 popular/default tools
     : TOOLS.filter(t =>
-        t.name.toLowerCase().includes(query.toLowerCase()) ||
-        t.description.toLowerCase().includes(query.toLowerCase()) ||
-        t.keywords.some(k => k.toLowerCase().includes(query.toLowerCase()))
-      );
+      t.name.toLowerCase().includes(query.toLowerCase()) ||
+      t.description.toLowerCase().includes(query.toLowerCase()) ||
+      t.keywords.some(k => k.toLowerCase().includes(query.toLowerCase()))
+    );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
@@ -92,7 +92,7 @@ export const CommandPalette: React.FC = () => {
       <div style={{
         width: '90%',
         maxWidth: '600px',
-        backgroundColor: 'var(--color-bg-card)',
+        backgroundColor: '#fff',
         border: '1px solid var(--color-border)',
         borderRadius: 'var(--radius-lg)',
         boxShadow: 'var(--shadow-lg)',
@@ -205,7 +205,7 @@ export const CommandPalette: React.FC = () => {
             }}>No tools match &ldquo;{query}&rdquo;</div>
           )}
         </div>
-        
+
         {/* Footer shortcuts helper */}
         <div style={{
           padding: '8px 18px',

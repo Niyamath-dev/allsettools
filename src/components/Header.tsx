@@ -1,6 +1,6 @@
 // src/components/Header.tsx
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Icon } from './Icons';
 import { CATEGORIES, TOOLS } from '@/lib/registry';
@@ -14,6 +14,26 @@ export const Header: React.FC = () => {
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [activeCat, setActiveCat] = useState(CATEGORIES[0]?.id ?? '');
   const [megaOpen, setMegaOpen] = useState(false);
+  const megaRef = useRef<HTMLDivElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        megaOpen &&
+        megaRef.current &&
+        !megaRef.current.contains(event.target as Node) &&
+        toggleButtonRef.current &&
+        !toggleButtonRef.current.contains(event.target as Node)
+      ) {
+        setMegaOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [megaOpen]);
 
   // Initialize theme & language preferences
   useEffect(() => {
@@ -77,7 +97,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="header animate-fade-in" style={{ position: 'sticky', top: 0, zIndex: 9999 }}>
+    <header className="header animate-fade-in" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, backgroundColor: 'var(--glass-bg)', backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)' }}>
       <div className="container header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '64px' }}>
 
         {/* Left Side Brand Logo */}
@@ -127,6 +147,7 @@ export const Header: React.FC = () => {
           {/* Tools Mega Menu Dropdown — Two-panel design with Bootstrap utilities */}
           <div className="nav-item-container" onMouseEnter={() => { if (!megaOpen) setActiveCat(CATEGORIES[0]?.id ?? activeCat); }}>
             <button
+              ref={toggleButtonRef}
               onClick={() => setMegaOpen(!megaOpen)}
               className="nav-item d-inline-flex align-items-center gap-1"
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-fg)', padding: 0 }}
@@ -135,14 +156,7 @@ export const Header: React.FC = () => {
               <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>▼</span>
             </button>
 
-            {megaOpen && (
-              <div
-                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9998, cursor: 'default' }}
-                onClick={() => setMegaOpen(false)}
-              />
-            )}
-
-            <div className={`mega-menu${megaOpen ? ' show' : ''}`}>
+            <div ref={megaRef} className={`mega-menu${megaOpen ? ' show' : ''}`}>
               {/* LEFT: Category sidebar */}
               <div className="mega-menu-sidebar">
                 <div className="mega-menu-sidebar-header text-uppercase fw-bold" style={{ letterSpacing: '0.08em' }}>
