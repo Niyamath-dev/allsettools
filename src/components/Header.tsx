@@ -269,25 +269,52 @@ export const Header: React.FC = () => {
           </button>
         </nav>
 
-        {/* Mobile Hamburger menu Button */}
+        {/* Mobile Controls (Theme Toggle + Hamburger) */}
         <div className="mobile-only">
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="btn-icon"
-            style={{ width: '36px', height: '36px' }}
-            aria-label="Toggle mobile navigation menu"
-          >
-            <span style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-              width: '18px'
-            }}>
-              <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', transform: menuOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}></span>
-              <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', opacity: menuOpen ? 0 : 1 }}></span>
-              <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', transform: menuOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}></span>
-            </span>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Mobile Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="btn-icon"
+              style={{ width: '36px', height: '36px', position: 'relative', overflow: 'hidden' }}
+              aria-label="Toggle theme"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              <span
+                key={theme}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  animation: 'themeSpin 0.35s cubic-bezier(0.16,1,0.3,1) forwards'
+                }}
+              >
+                <Icon
+                  name={theme === 'dark' ? 'sun' : 'moon'}
+                  style={{ width: '18px', height: '18px', color: theme === 'dark' ? '#f59e0b' : '#6366f1' }}
+                />
+              </span>
+            </button>
+
+            {/* Mobile Hamburger menu Button */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="btn-icon"
+              style={{ width: '36px', height: '36px' }}
+              aria-label="Toggle mobile navigation menu"
+            >
+              <span style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                width: '18px'
+              }}>
+                <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', transform: menuOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}></span>
+                <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', opacity: menuOpen ? 0 : 1 }}></span>
+                <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', transform: menuOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}></span>
+              </span>
+            </button>
+          </div>
         </div>
 
       </div>
