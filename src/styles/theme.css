@@ -4,12 +4,12 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', Courier, monospace;
   
-  /* Modern Rounded Corners (12px - 16px) */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* Modern Rounded Corners (Softer & Premium) */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-full: 9999px;
 
   /* Smooth transitions */
@@ -17,66 +17,66 @@
   --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Subtle Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.1);
+  /* Premium Box Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 12px 34px -10px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 30px 60px -15px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.04);
   --shadow-border: 0 0 0 1px var(--color-border);
 }
 
-/* Dark Mode Color Palette (Supabase / Dark Vercel style) */
+/* Dark Mode Color Palette (Premium Indigo/Purple/Teal Dark theme) */
 :root,
 [data-theme="dark"] {
   color-scheme: dark;
   
   /* Backgrounds */
-  --color-bg: #0a0a0a;
-  --color-bg-subtle: #0e131f;
-  --color-bg-card: #111827;
-  --color-bg-hover: #1f2937;
-  --color-bg-active: #374151;
+  --color-bg: #050507;
+  --color-bg-subtle: #09090f;
+  --color-bg-card: rgba(13, 13, 21, 0.45);
+  --color-bg-hover: rgba(26, 26, 38, 0.8);
+  --color-bg-active: rgba(38, 38, 56, 0.95);
 
   /* Foregrounds */
-  --color-fg: #fafafa;
-  --color-fg-muted: #9ca3af;
-  --color-fg-dimmed: #6b7280;
+  --color-fg: #f4f4f6;
+  --color-fg-muted: #a1a1aa;
+  --color-fg-dimmed: #717172;
 
   /* Borders */
-  --color-border: #1f2937;
-  --color-border-hover: #374151;
-  --color-border-active: #3b82f6;
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-hover: rgba(255, 255, 255, 0.15);
+  --color-border-active: #6366f1;
 
   /* Accent Branding Colors */
-  --color-primary: #3b82f6;
+  --color-primary: #6366f1;
   --color-primary-fg: #ffffff;
-  --color-secondary: #8b5cf6;
-  --color-accent: #22d3ee;
+  --color-secondary: #a855f7;
+  --color-accent: #14b8a6;
   
   --color-danger: #ef4444;
   --color-success: #10b981;
   --color-warning: #f59e0b;
 
   /* Glassmorphic values */
-  --glass-bg: rgba(10, 10, 10, 0.75);
+  --glass-bg: rgba(5, 5, 7, 0.7);
   --glass-border: rgba(255, 255, 255, 0.05);
-  --glass-blur: blur(16px);
+  --glass-blur: blur(20px);
 
   /* Modern gradient effects */
-  --gradient-bg: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0a0a0a 100%);
-  --gradient-brand: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #22d3ee 100%);
+  --gradient-bg: radial-gradient(circle at top, rgba(99, 102, 241, 0.09) 0%, rgba(5, 5, 7, 0) 65%), #050507;
+  --gradient-brand: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #14b8a6 100%);
   --gradient-card-border: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
 }
 
-/* Light Mode Color Palette (Vercel / Stripe style) */
+/* Light Mode Color Palette (Premium Sleek Light theme) */
 [data-theme="light"] {
   color-scheme: light;
 
   /* Backgrounds */
-  --color-bg: #ffffff;
+  --color-bg: #f8fafc;
   --color-bg-subtle: #f1f5f9;
-  --color-bg-card: #f8fafc;
-  --color-bg-hover: #f1f5f9;
-  --color-bg-active: #e2e8f0;
+  --color-bg-card: rgba(255, 255, 255, 0.75);
+  --color-bg-hover: rgba(241, 245, 249, 0.85);
+  --color-bg-active: rgba(226, 232, 240, 0.95);
 
   /* Foregrounds */
   --color-fg: #0f172a;
@@ -84,27 +84,27 @@
   --color-fg-dimmed: #64748b;
 
   /* Borders */
-  --color-border: #e2e8f0;
-  --color-border-hover: #cbd5e1;
-  --color-border-active: #2563eb;
+  --color-border: rgba(15, 23, 42, 0.08);
+  --color-border-hover: rgba(15, 23, 42, 0.15);
+  --color-border-active: #4f46e5;
 
   /* Accent Branding Colors */
-  --color-primary: #2563eb;
+  --color-primary: #4f46e5;
   --color-primary-fg: #ffffff;
-  --color-secondary: #7c3aed;
-  --color-accent: #06b6d4;
+  --color-secondary: #9333ea;
+  --color-accent: #0d9488;
   
   --color-danger: #ef4444;
   --color-success: #10b981;
   --color-warning: #f59e0b;
 
   /* Glassmorphic values */
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(15, 23, 42, 0.06);
-  --glass-blur: blur(16px);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(15, 23, 42, 0.04);
+  --glass-blur: blur(20px);
 
   /* Modern gradient effects */
-  --gradient-bg: radial-gradient(circle at 50% 0%, #e0f2fe 0%, #ffffff 100%);
-  --gradient-brand: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #06b6d4 100%);
+  --gradient-bg: radial-gradient(circle at top, rgba(79, 70, 229, 0.06) 0%, rgba(248, 250, 252, 0) 65%), #f8fafc;
+  --gradient-brand: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #0d9488 100%);
   --gradient-card-border: linear-gradient(180deg, rgba(15,23,42,0.04) 0%, rgba(15,23,42,0.01) 100%);
 }

@@ -94,32 +94,34 @@ export const Header: React.FC = () => {
           style={{
             display: 'flex',
             alignItems: 'center',
-            background: 'var(--color-bg-subtle)',
+            background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius-md)',
-            padding: '6px 12px',
-            gap: '8px',
+            padding: '8px 16px',
+            gap: '10px',
             cursor: 'pointer',
             color: 'var(--color-fg-muted)',
             fontSize: '0.8125rem',
-            width: '240px',
+            width: '220px',
             maxWidth: '100%',
             textAlign: 'left',
-            transition: 'all var(--transition-fast)'
+            transition: 'all var(--transition-fast)',
+            boxShadow: 'var(--shadow-sm)'
           }}
           className="search-trigger desktop-only"
           aria-label="Search tools"
         >
-          <Icon name="search" style={{ width: '15px', height: '15px' }} />
+          <Icon name="search" style={{ width: '14px', height: '14px' }} />
           <span style={{ flex: 1 }}>Search tools...</span>
-          <span style={{
-            fontSize: '0.7rem',
-            background: 'var(--color-bg-card)',
-            padding: '1px 5px',
-            borderRadius: '3px',
+          <kbd style={{
+            fontSize: '0.65rem',
+            background: 'var(--color-bg-subtle)',
+            padding: '2px 6px',
+            borderRadius: 'var(--radius-xs)',
             border: '1px solid var(--color-border)',
-            fontFamily: 'var(--font-mono)'
-          }}>⌘K</span>
+            fontFamily: 'var(--font-mono)',
+            color: 'var(--color-primary)'
+          }}>⌘K</kbd>
         </button>
 
         {/* Desktop Navigation Links */}
@@ -178,7 +180,7 @@ export const Header: React.FC = () => {
                 {(() => {
                   const cat = CATEGORIES.find(c => c.id === activeCat);
                   const catTools = TOOLS.filter(t => t.category === activeCat);
-                  const tools = catTools.slice(0, 9);
+                  const tools = catTools.slice(0, 18);
                   return (
                     <>
                       <div className="mega-menu-panel-header">

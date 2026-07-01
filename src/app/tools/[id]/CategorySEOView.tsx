@@ -81,24 +81,15 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
         borderBottom: '1px solid var(--color-border)',
         marginBottom: '3rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
-          <div style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: 'var(--color-bg-subtle)',
-            border: '1px solid var(--color-border)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Icon name={category.icon} style={{ width: '24px', height: '24px', color: 'var(--color-primary)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '1.25rem' }}>
+          <div className="icon-wrapper" style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-md)' }}>
+            <Icon name={category.icon} style={{ width: '24px', height: '24px' }} />
           </div>
           <div>
-            <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.04em', border: 'none', padding: 0, margin: 0 }}>
+            <h1 className="gradient-text" style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.04em', border: 'none', padding: 0, margin: 0, lineHeight: 1.1 }}>
               {category.name}
             </h1>
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', margin: 0 }}>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', margin: '4px 0 0 0', fontWeight: 500 }}>
               Free All-In-One Programmatic Toolsets
             </p>
           </div>
@@ -118,11 +109,11 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
             {categoryTools.map(tool => (
               <Link href={`/tools/${tool.id}`} key={tool.id} className="card card-hover" style={{ padding: '1.5rem', justifyContent: 'space-between' }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
-                    <Icon name={tool.icon} style={{ width: '16px', height: '16px', color: 'var(--color-fg-muted)' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
+                    <Icon name={tool.icon} className="tool-card-icon" style={{ width: '18px', height: '18px' }} />
                     <h3 style={{ fontSize: '1rem', fontWeight: 600, margin: 0 }}>{tool.name}</h3>
                   </div>
-                  <p style={{ fontSize: '0.8125rem', lineHeight: '1.4', margin: 0 }}>{tool.description}</p>
+                  <p style={{ fontSize: '0.8125rem', lineHeight: '1.5', margin: 0, color: 'var(--color-fg-muted)' }}>{tool.description}</p>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
                   <span style={{
@@ -131,8 +122,9 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
                     color: 'var(--color-primary)',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px'
-                  }}>
+                    gap: '4px',
+                    transition: 'all var(--transition-fast)'
+                  }} className="launch-link">
                     Launch Tool ↗
                   </span>
                 </div>
@@ -167,18 +159,7 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
                   <Link
                     key={c.id}
                     href={`/tools/${c.id}`}
-                    style={{
-                      fontSize: '0.875rem',
-                      fontWeight: isActive ? 600 : 400,
-                      color: isActive ? 'var(--color-primary)' : 'var(--color-fg-muted)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '6px 8px',
-                      borderRadius: 'var(--radius-sm)',
-                      backgroundColor: isActive ? 'var(--color-bg-hover)' : 'transparent',
-                      transition: 'all var(--transition-fast)'
-                    }}
+                    className={`sidebar-nav-item${isActive ? ' active' : ''}`}
                   >
                     <Icon name={c.icon} style={{ width: '14px', height: '14px' }} />
                     <span>{c.name}</span>

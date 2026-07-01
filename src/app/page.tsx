@@ -115,51 +115,25 @@ export default function Home() {
 
       {/* 1. HERO BANNER WITH SEARCH */}
       <section className="hero-section">
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: 'var(--color-bg-subtle)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-full)',
-          padding: '4px 14px',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          color: 'var(--color-fg-muted)',
-          fontFamily: 'var(--font-mono)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em'
-        }}>
+        <div className="hero-badge animate-fade-in">
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--color-success)', display: 'inline-block' }}></span>
           Built for Speed, Privacy & Simplicity
         </div>
         <h1 className="hero-title">
-          Secure browser-local utility workspace for developers.
+          Secure browser-local utility workspace for <span className="gradient-text">developers</span>.
         </h1>
         <p className="hero-desc">
           AllSetTools delivers 200+ formatting, compression, decoding, and calculating tools. 100% offline-ready, running directly on your CPU.
         </p>
 
         {/* Search Bar Input */}
-        <div style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: '560px',
-          marginTop: '1.5rem'
-        }}>
+        <div className="hero-search-wrapper">
           <input
             type="text"
             placeholder="Search 200+ tools (e.g. JSON formatter, Base64, Image crop)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input"
-            style={{
-              padding: '16px 20px 16px 50px',
-              fontSize: '1rem',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: 'var(--shadow-md)',
-              transition: 'all var(--transition-normal)'
-            }}
+            className="input hero-search-input"
           />
           <Icon name="search" style={{
             position: 'absolute',
@@ -262,14 +236,16 @@ export default function Home() {
               return (
                 <Link href={`/tools/${c.id}`} key={c.id} className="card card-hover" style={{ padding: '1.5rem', gap: '0.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <Icon name={c.icon} style={{ width: '24px', height: '24px', color: 'var(--color-primary)' }} />
-                      <span className="badge" style={{ backgroundColor: 'var(--color-bg-active)', color: 'var(--color-fg-muted)', fontSize: '0.7rem', fontWeight: 600 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div className="icon-wrapper">
+                        <Icon name={c.icon} style={{ width: '20px', height: '20px' }} />
+                      </div>
+                      <span className="badge-pill">
                         {catTools.length} tools
                       </span>
                     </div>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 600, marginTop: '12px', marginBottom: '4px' }}>{c.name}</h3>
-                    <p style={{ fontSize: '0.75rem', lineHeight: '1.4', margin: 0, color: 'var(--color-fg-muted)' }}>{c.description}</p>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 600, marginTop: '16px', marginBottom: '6px' }}>{c.name}</h3>
+                    <p style={{ fontSize: '0.75rem', lineHeight: '1.5', margin: 0, color: 'var(--color-fg-muted)' }}>{c.description}</p>
                   </div>
                 </Link>
               );
@@ -326,15 +302,11 @@ export default function Home() {
               >
                 <Link href={`/tools/${tool.id}`} className="card card-hover" style={{ padding: '1.5rem', height: '180px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <Icon name={tool.icon} style={{ width: '22px', height: '22px' }} />
-                    <span style={{
+                    <Icon name={tool.icon} className="tool-card-icon" style={{ width: '22px', height: '22px' }} />
+                    <span className="badge-pill" style={{
                       fontSize: '0.65rem',
                       fontFamily: 'var(--font-mono)',
                       textTransform: 'uppercase',
-                      color: 'var(--color-fg-muted)',
-                      border: '1px solid var(--color-border)',
-                      padding: '2px 6px',
-                      borderRadius: 'var(--radius-sm)'
                     }}>{tool.category}</span>
                   </div>
                   <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '0.5rem' }}>{tool.name}</h3>
@@ -357,10 +329,10 @@ export default function Home() {
             {popularTools.map(tool => (
               <Link href={`/tools/${tool.id}`} key={tool.id} className="card card-hover" style={{ padding: '1.25rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                  <Icon name={tool.icon} style={{ width: '18px', height: '18px' }} />
+                  <Icon name={tool.icon} className="tool-card-icon" style={{ width: '18px', height: '18px' }} />
                   <button
                     onClick={(e) => toggleFavorite(tool.id, e)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: favorites.includes(tool.id) ? 'var(--color-fg)' : 'var(--color-fg-dimmed)' }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: favorites.includes(tool.id) ? 'var(--color-primary)' : 'var(--color-fg-dimmed)' }}
                     aria-label="Favorite tool"
                   >
                     <Icon name="tag" style={{ width: '13px', height: '13px', fill: favorites.includes(tool.id) ? 'currentColor' : 'none' }} />
@@ -379,19 +351,19 @@ export default function Home() {
         <section style={{ marginBottom: '5.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '3.5rem' }}>
           <div className="grid-cols-4" style={{ textAlign: 'center' }}>
             <div style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', color: 'var(--color-fg)', fontFamily: 'var(--font-mono)' }}>200+</div>
+              <div className="gradient-text" style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', fontFamily: 'var(--font-mono)' }}>200+</div>
               <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', marginTop: '4px' }}>Free Local Utilities</p>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', color: 'var(--color-fg)', fontFamily: 'var(--font-mono)' }}>100%</div>
+              <div className="gradient-text" style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', fontFamily: 'var(--font-mono)' }}>100%</div>
               <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', marginTop: '4px' }}>Browser-Side Runs</p>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', color: 'var(--color-fg)', fontFamily: 'var(--font-mono)' }}>0</div>
+              <div className="gradient-text" style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', fontFamily: 'var(--font-mono)' }}>0</div>
               <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', marginTop: '4px' }}>Data Upload Logs</p>
             </div>
             <div style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', color: 'var(--color-fg)', fontFamily: 'var(--font-mono)' }}>&lt; 1ms</div>
+              <div className="gradient-text" style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-0.05em', fontFamily: 'var(--font-mono)' }}>&lt; 1ms</div>
               <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', marginTop: '4px' }}>Average Execution Speed</p>
             </div>
           </div>
@@ -520,14 +492,15 @@ export default function Home() {
       {searchQuery.trim() === '' && (
         <section style={{ marginBottom: '5.5rem' }}>
           <div className="card" style={{
-            padding: '3.5rem 2rem',
+            padding: '4rem 2rem',
             textAlign: 'center',
-            background: 'linear-gradient(180deg, var(--color-bg-card) 0%, var(--color-bg-subtle) 100%)',
+            background: 'radial-gradient(circle at center, rgba(99, 102, 241, 0.08) 0%, var(--color-bg-card) 100%)',
             border: '1px solid var(--color-border)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '1.5rem'
+            gap: '1.5rem',
+            boxShadow: '0 20px 40px -15px rgba(99, 102, 241, 0.1)'
           }}>
             <h2 style={{ fontSize: '2rem', border: 'none', padding: 0, margin: 0, fontWeight: 800, letterSpacing: '-0.03em' }}>Ready to accelerate your dev workflow?</h2>
             <p style={{ fontSize: '1rem', color: 'var(--color-fg-muted)', maxWidth: '520px', lineHeight: '1.6' }}>
@@ -536,9 +509,10 @@ export default function Home() {
                 padding: '3px 7px',
                 border: '1px solid var(--color-border)',
                 borderRadius: '5px',
-                backgroundColor: 'var(--color-bg)',
+                backgroundColor: 'var(--color-bg-subtle)',
                 fontSize: '0.85em',
-                boxShadow: 'var(--shadow-sm)'
+                boxShadow: 'var(--shadow-sm)',
+                color: 'var(--color-primary)'
               }}>Ctrl + K</kbd> to open our Spotlight Command Palette instantly from anywhere on the platform.
             </p>
             <div style={{ display: 'flex', gap: '12px', marginTop: '0.5rem' }}>
