@@ -584,6 +584,13 @@ export const Icon: React.FC<IconProps> = ({ name, className = '', ...props }) =>
           <rect x="3" y="14" width="7" height="7" />
         </svg>
       );
+    case 'arrow-up':
+      return (
+        <svg {...iconProps}>
+          <line x1="12" y1="19" x2="12" y2="5" />
+          <polyline points="5 12 12 5 19 12" />
+        </svg>
+      );
     default:
       // Fallback settings icon
       return (

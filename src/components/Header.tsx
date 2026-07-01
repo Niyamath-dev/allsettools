@@ -8,7 +8,7 @@ import { toast } from './Toast';
 import { Logo } from './Logo';
 
 export const Header: React.FC = () => {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const [lang, setLang] = useState('en');
   const [menuOpen, setMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -17,33 +17,19 @@ export const Header: React.FC = () => {
 
   // Initialize theme & language preferences
   useEffect(() => {
-    // 1. Theme Configuration with System Detection
+    // 1. Theme Configuration
     const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
     } else {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const systemTheme = systemDark ? 'dark' : 'light';
-      setTheme(systemTheme);
-      document.documentElement.setAttribute('data-theme', systemTheme);
+      setTheme('light');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
-        const nextTheme = e.matches ? 'dark' : 'light';
-        setTheme(nextTheme);
-        document.documentElement.setAttribute('data-theme', nextTheme);
-      }
-    };
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
 
     // 2. Language Preference Load
     const savedLang = localStorage.getItem('allsettools_lang') || 'en';
     setLang(savedLang);
-
-    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
   }, []);
 
   const toggleTheme = () => {
@@ -60,6 +46,17 @@ export const Header: React.FC = () => {
     setLangDropdownOpen(false);
     toast.success(`Language set to ${newLang === 'en' ? 'English' : newLang === 'es' ? 'Español' : newLang === 'fr' ? 'Français' : 'Deutsch'}`);
   };
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
 
   const triggerSearch = () => {
     const event = new KeyboardEvent('keydown', {
@@ -140,7 +137,7 @@ export const Header: React.FC = () => {
 
             {megaOpen && (
               <div
-                style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9998, cursor: 'default' }}
+                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9998, cursor: 'default' }}
                 onClick={() => setMegaOpen(false)}
               />
             )}
@@ -274,9 +271,9 @@ export const Header: React.FC = () => {
               gap: '4px',
               width: '18px'
             }}>
-              <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', transform: menuOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }}></span>
+              <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', transform: menuOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}></span>
               <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', opacity: menuOpen ? 0 : 1 }}></span>
-              <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', transform: menuOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }}></span>
+              <span style={{ height: '2px', backgroundColor: 'var(--color-fg)', width: '100%', transition: 'all var(--transition-fast)', transform: menuOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}></span>
             </span>
           </button>
         </div>
@@ -286,18 +283,20 @@ export const Header: React.FC = () => {
       {/* Mobile Drawer Overlay */}
       {menuOpen && (
         <div style={{
-          position: 'absolute',
+          position: 'fixed',
           top: '64px',
           left: 0,
-          width: '100%',
-          backgroundColor: 'var(--color-bg-card)',
+          right: 0,
+          height: 'calc(100vh - 64px)',
+          overflowY: 'auto',
+          backgroundColor: '#fff',
           borderBottom: '1px solid var(--color-border)',
           boxShadow: 'var(--shadow-md)',
           zIndex: 9998,
           display: 'flex',
           flexDirection: 'column',
           padding: '1.5rem',
-          gap: '1rem',
+          gap: '1.5rem',
           animation: 'fadeIn var(--transition-fast) forwards'
         }}>
           {/* Search Trigger for Mobile */}
