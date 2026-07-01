@@ -1,0 +1,38 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Feedback {
+  id          String   @id @default(uuid())
+  name        String   @default("Anonymous")
+  email       String?
+  tool        String   @default("general")
+  rating      Int      @default(5)
+  comment     String
+  submittedAt DateTime @default(now())
+}
+
+model Subscription {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  subscribed DateTime @default(now())
+}
+
+model BlogPost {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String
+  category    String
+  publishedAt DateTime @default(now())
+  readTime    String   @default("5 min read")
+  author      String   @default("Administrator")
+}
