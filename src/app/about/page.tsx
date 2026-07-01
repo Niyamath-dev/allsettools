@@ -56,6 +56,54 @@ export default function AboutPage() {
           </ul>
         </section>
 
+        {/* FAQs Collapsible Accordion */}
+        <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginTop: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1.5rem', color: 'var(--color-fg)', border: 'none', padding: 0 }}>
+            Frequently Asked Questions
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+              <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>What is the core mission of AllSetTools?</span>
+                <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+              </summary>
+              <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+                Our mission is to provide developers, designers, and web operators with a secure, high-performance, and completely free utility suite. We believe online formatters, hash calculators, and encoders should never compromise user data privacy or restrict functions behind paywalls or registration forms.
+              </p>
+            </details>
+
+            <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+              <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>How does client-side execution protect my data?</span>
+                <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+              </summary>
+              <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+                Unlike standard utilities that upload content to remote SQL databases, all calculations on AllSetTools run locally in your browser sandbox using JavaScript. This guarantees that your sensitive API tokens, raw passwords, or binary images never cross the network or get logged on our server logs.
+              </p>
+            </details>
+
+            <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+              <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Can I run the platform offline?</span>
+                <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+              </summary>
+              <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+                Yes! Because all modules are compiled as static HTML, CSS, and JS code segments, once your browser caches the assets, you can run all formatters, builders, and math calculators fully offline without any active network connection.
+              </p>
+            </details>
+
+            <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+              <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>How is AllSetTools funded if it is entirely free?</span>
+                <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+              </summary>
+              <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+                We maintain AllSetTools through minimal, privacy-compliant developer sponsorships and user donations. This pays for our CDN bandwidth and hosting infrastructure while keeping the platform entirely free of trackers, cookie walls, or annoying full-screen ads.
+              </p>
+            </details>
+          </div>
+        </section>
+
         <div className="card" style={{
           padding: '2rem',
           textAlign: 'center',
@@ -64,7 +112,7 @@ export default function AboutPage() {
           flexDirection: 'column',
           alignItems: 'center',
           gap: '1rem',
-          marginTop: '1rem'
+          marginTop: '1.5rem'
         }}>
           <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Have suggestions or feedback?</h3>
           <p style={{ fontSize: '0.875rem', margin: 0 }}>We continuously deploy optimization updates and release new tool sets based on user requests.</p>

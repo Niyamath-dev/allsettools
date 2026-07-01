@@ -142,6 +142,10 @@ const generateToolSEOContent = (tool: Tool) => {
     {
       q: `Does this utility support offline access?`,
       a: `Yes, because the operations are compiled locally as static web assets, you can run this tool offline once the page has loaded.`
+    },
+    {
+      q: `Do you log or compile my calculations?`,
+      a: `No. We track only basic, anonymous page view counts. The values, texts, keys, and file contents you process are entirely restricted to your local browser execution context.`
     }
   ];
 

@@ -351,6 +351,54 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* FAQs Collapsible Accordion */}
+      <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginTop: '3rem', marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1.5rem', color: 'var(--color-fg)', border: 'none', padding: 0 }}>
+          Frequently Asked Questions
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>How are the usage analytics tracked?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              Calculations and edits are registered via local storage event counters. No network pings or database queries are generated.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Can I draft custom tutorials permanently?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              Yes. Custom articles draft logs are stored in your current browser&apos;s local cache. Clearing site files will wipe these local posts.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Is there access control on this dashboard?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              For this validation version, the console is open for layout verification, allowing you to test drafts, analytics, and feedback inputs.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Where can I manage tools definitions?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              The tool registry data schema is hardcoded inside static JavaScript registries to guarantee offline launch speeds.
+            </p>
+          </details>
+        </div>
+      </section>
     </div>
   );
 }

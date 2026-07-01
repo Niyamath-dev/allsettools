@@ -6,6 +6,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
+import { ScrollReset } from "@/components/ScrollReset";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ToastProvider } from "@/components/Toast";
 
@@ -66,6 +67,7 @@ export default function RootLayout({
         style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0 }}
         suppressHydrationWarning={true}
       >
+        <ScrollReset />
         <Header />
         <main style={{ flex: 1, paddingTop: 'calc(64px + 2rem)', paddingBottom: '4rem' }}>
           {children}

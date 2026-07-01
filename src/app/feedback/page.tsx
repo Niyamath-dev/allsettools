@@ -107,6 +107,54 @@ export default function UserFeedback() {
           Submit Feedback
         </button>
       </form>
+
+      {/* FAQs Collapsible Accordion */}
+      <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginTop: '3rem', marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1.5rem', color: 'var(--color-fg)', border: 'none', padding: 0 }}>
+          Frequently Asked Questions
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Why should I submit feedback?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              Your feedback directly impacts our development pipeline. We use reviews to fix layout bugs, optimize processing scripts, and release new tool sets.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Can I submit feedback anonymously?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              Yes. Providing your name and email address is entirely optional. If left blank, your feedback is registered anonymously.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Where is my feedback stored?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              Feedback ratings and comments are securely saved in your browser&apos;s LocalStorage session database for validation testing and demo purposes.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>How often do you release updates based on feedback?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              We review reports daily and deploy weekly updates to improve tool compatibility, correct minor calculator equations, and optimize styles.
+            </p>
+          </details>
+        </div>
+      </section>
     </div>
   );
 }

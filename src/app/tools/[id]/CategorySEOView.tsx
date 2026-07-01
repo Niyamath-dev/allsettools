@@ -16,32 +16,59 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
   const categoryFaqs: Record<string, { q: string, a: string }[]> = {
     text: [
       { q: "How do text tools process my documents?", a: "All parsing, case converting, sorting, and deduplication run inside your browser. No letters or character strings are uploaded to server nodes." },
-      { q: "Can I use the Markdown editor offline?", a: "Yes, the HTML preview parsing executes locally in Javascript, meaning you can write and compile layouts without internet access." }
+      { q: "Can I use the Markdown editor offline?", a: "Yes, the HTML preview parsing executes locally in Javascript, meaning you can write and compile layouts without internet access." },
+      { q: "Is there a character limit for text counting?", a: "There is no server-imposed limit. Our counters can process files as large as your device memory permits." },
+      { q: "Do formatting tools store diff comparisons?", a: "No, text comparisons are computed entirely in-memory and disappear once you refresh the tab." }
     ],
     dev: [
       { q: "Is pasting JSON codes here secure?", a: "Yes. Our JSON tools do not send network payloads. The formatting, validation, and tree-node parsing run entirely in client-side script contexts." },
-      { q: "What library parses the JWT decryptions?", a: "We decode JWT payloads locally using built-in Base64 URL decoding, ensuring no credentials leak." }
+      { q: "What library parses the JWT decryptions?", a: "We decode JWT payloads locally using built-in Base64 URL decoding, ensuring no credentials leak." },
+      { q: "Can the XML formatter handle invalid tags?", a: "The formatter attempts to repair basic open/close tag nesting errors client-side and points out severe syntax errors." },
+      { q: "Do the HTML/CSS minifiers compress code effectively?", a: "Yes, they strip comments, remove layout spacing, and compress variable blocks locally using highly optimized regular expression parsers." }
     ],
     image: [
       { q: "Are my photos uploaded during compression?", a: "No. The compressor, cropping overlay, and format converters draw content directly onto local HTML5 <canvas> nodes to process pixels offline." },
-      { q: "Is barcode generation done via external APIs?", a: "No, Barcode Code39 and QR codes are compiled entirely offline in the browser and exported as scalable inline SVGs." }
+      { q: "Is barcode generation done via external APIs?", a: "No, Barcode Code39 and QR codes are compiled entirely offline in the browser and exported as scalable inline SVGs." },
+      { q: "What image export formats are supported?", a: "You can convert images to WebP, PNG, JPEG, and BMP formats, which are compiled locally via browser canvas rendering APIs." },
+      { q: "Is there a file size limit on image uploads?", a: "The limits are defined by your local device's memory performance; we recommend processing images under 50MB for smooth operations." }
     ],
     ai: [
-      { q: "How do I secure my AI API credentials?", a: "Your API keys are stored only in your local browser storage. Requests are made directly from your client IP to OpenAI/Gemini servers without proxy servers." }
+      { q: "How do I secure my AI API credentials?", a: "Your API keys are stored only in your local browser storage. Requests are made directly from your client IP to OpenAI/Gemini servers without proxy servers." },
+      { q: "What happens if I do not provide an API key?", a: "Our AI tools fallback to local heuristic models and offline dictionaries to help you draft tags and content skeletons." },
+      { q: "Do the AI content generators log the queries?", a: "No. Because calls bypass AllSetTools servers entirely, we have no access to your prompts or generated content." },
+      { q: "Can I inspect the direct AI calls?", a: "Yes. You can open your browser's Network Inspector tab to verify that calls connect directly to official API servers like api.openai.com." }
     ],
     seo: [
-      { q: "Do the density analyzers crawler track my site?", a: "No, they read the raw HTML code you provide and map elements in real time. We make no requests to your live pages." }
+      { q: "Do the density analyzers crawler track my site?", a: "No, they read the raw HTML code you provide and map elements in real time. We make no requests to your live pages." },
+      { q: "How is keyword density calculated?", a: "The system strips HTML tags, filters out stop-words, and calculates the exact frequency percentage of each word locally." },
+      { q: "Can I generate a Sitemap XML file here?", a: "Yes. You can input your URL structure and priority tags to compile a valid XML schema structure that is downloadable directly." },
+      { q: "Are the Meta Tag generators SEO compliant?", a: "Yes, they adhere strictly to schema guidelines, Open Graph specifications, and Google search card constraints." }
     ],
     business: [
-      { q: "Is printable invoice creation safe?", a: "Yes, your client rosters, item descriptions, and banking numbers are stored solely in your current browser memory." }
+      { q: "Is printable invoice creation safe?", a: "Yes, your client rosters, item descriptions, and banking numbers are stored solely in your current browser memory." },
+      { q: "Can I download or export my sheets?", a: "Yes, invoices and calculation tables are exportable as standard CSV files or print-optimized PDF formats." },
+      { q: "Are these calculators updated for tax changes?", a: "The calculation rules use standard static tax formulas. We encourage double-checking values for critical accounting transactions." },
+      { q: "Is database backup possible for invoice logs?", a: "Logs are backed up via LocalStorage. You can clear or wipe them by resetting your browser site data cache." }
     ],
     utility: [
-      { q: "Are password strength calculations reliable?", a: "Yes, we evaluate password entropy metrics client-side using length and character varieties, with no server lookup logs." }
+      { q: "Are password strength calculations reliable?", a: "Yes, we evaluate password entropy metrics client-side using length and character varieties, with no server lookup logs." },
+      { q: "How is the random password generator secure?", a: "It uses the browser's native cryptographically secure pseudo-random number generator (CSPRNG), ensuring high entropy values." },
+      { q: "What algorithms are supported in text hash calculations?", a: "We support MD5, SHA-1, SHA-256, and SHA-512, which are compiled client-side using JavaScript crypto libraries." },
+      { q: "Can I use the unit converters without internet?", a: "Yes. The unit conversion calculations are purely mathematical formulas and execute instantly offline." }
+    ],
+    misc: [
+      { q: "What kinds of tools are inside the Miscellaneous section?", a: "The section houses calendar builders, holiday planners, random choose spinners, and simple list randomizers." },
+      { q: "Do calendar planners sync with external apps?", a: "No, all schedules are stored locally. You can print the calendar layouts or save them to your browser storage." },
+      { q: "How is the random list selector determined?", a: "We use local pseudo-random generators to shuffle and draw items, ensuring fair random draws offline." },
+      { q: "Are there daily usage limits on these planners?", a: "No, all calculators and spinners are completely free with no usage limits." }
     ]
   };
 
   const currentFaqs = categoryFaqs[category.id] || [
-    { q: "Are these tools free to use?", a: "Yes, all tools are completely free, with no usage limits, no paywalls, and no registration requirements." }
+    { q: "Are these tools free to use?", a: "Yes, all tools are completely free, with no usage limits, no paywalls, and no registration requirements." },
+    { q: "Why are calculations done client-side?", a: "Doing operations client-side provides microsecond-fast speeds, removes server latency, and guarantees absolute privacy for your data." },
+    { q: "Does AllSetTools track my activity?", a: "No. We do not inspect your inputs, files, or derived outputs. We only track generic page count metrics for sizing optimizations." },
+    { q: "Can I contribute a new tool request?", a: "Yes, we welcome developer proposals! You can submit details through our feedback portal or inspect our contact details." }
   ];
 
   // Programmatic SEO JSON-LD schema markup

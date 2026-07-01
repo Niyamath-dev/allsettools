@@ -125,6 +125,54 @@ export default function ContactPage() {
         </aside>
 
       </div>
+
+      {/* FAQs Collapsible Accordion */}
+      <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginTop: '3rem', marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1.5rem', color: 'var(--color-fg)', border: 'none', padding: 0 }}>
+          Frequently Asked Questions
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>How long does it take to receive a response?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              We read every submission and aim to respond to bug reports, custom tool inquiries, and sponsor partnerships within 24 business hours.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Can I request a custom developer utility?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              Yes, absolutely! We prioritize new tools based on user demand. Select &apos;Custom Tool Request&apos; in the subject dropdown and describe your format specifications.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Is there a direct email support line?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              Yes, you can write directly to our technical support team at support@allsettools.dev for assistance with self-hosting, tools bugs, or sponsorship.
+            </p>
+          </details>
+
+          <details className="card" style={{ padding: '1.25rem', cursor: 'pointer' }}>
+            <summary style={{ fontWeight: 600, fontSize: '1rem', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Where are contact submissions logged?</span>
+              <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
+            </summary>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
+              For layout validation, contact requests are securely logged locally in your current browser session cache database and never uploaded to remote databases.
+            </p>
+          </details>
+        </div>
+      </section>
     </div>
   );
 }
