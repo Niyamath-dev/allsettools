@@ -250,62 +250,250 @@ export const ImageCropper: React.FC = () => {
 
 // 4. Image Converter
 export const ImageConverter: React.FC = () => {
-  const [image, setImage] = useState<string | null>(null);
-  const [name, setName] = useState('image.png');
-  const [format, setFormat] = useState('image/jpeg');
-  const [converted, setConverted] = useState<string | null>(null);
+  interface ImageItem {
+    id: string;
+    file: File;
+    name: string;
+    size: number;
+    preview: string;
+    format: string;
+    convertedUrl: string | null;
+    isConverting: boolean;
+  }
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setName(file.name.substring(0, file.name.lastIndexOf('.')));
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setImage(event.target?.result as string);
-    };
-    reader.readAsDataURL(file);
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [globalFormat, setGlobalFormat] = useState('image/jpeg');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+
+    let fileList = Array.from(selectedFiles);
+
+    if (fileList.length > 10) {
+      toast.error('You can upload a maximum of 10 images.');
+      fileList = fileList.slice(0, 10);
+    }
+
+    const newItems: ImageItem[] = [];
+    let loadedCount = 0;
+
+    fileList.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const id = `${Date.now()}-${index}-${file.name}`;
+        newItems.push({
+          id,
+          file,
+          name: file.name.substring(0, file.name.lastIndexOf('.')),
+          size: file.size,
+          preview: event.target?.result as string,
+          format: globalFormat,
+          convertedUrl: null,
+          isConverting: false
+        });
+
+        loadedCount++;
+        if (loadedCount === fileList.length) {
+          setImages(prev => {
+            const combined = [...prev, ...newItems];
+            if (combined.length > 10) {
+              toast.show('Total list limited to 10 images.', 'info');
+              return combined.slice(0, 10);
+            }
+            return combined;
+          });
+          toast.success(`Loaded ${fileList.length} image(s)`);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (e.target) {
+      e.target.value = '';
+    }
   };
 
-  const handleConvert = () => {
-    if (!image) return;
+  const convertSingle = (item: ImageItem) => {
+    setImages(prev => prev.map(img => img.id === item.id ? { ...img, isConverting: true } : img));
+
     const img = new Image();
-    img.src = image;
+    img.src = item.preview;
     img.onload = () => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) {
+        setImages(prev => prev.map(img => img.id === item.id ? { ...img, isConverting: false } : img));
+        return;
+      }
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
-      setConverted(canvas.toDataURL(format));
-      toast.success('Formatted converted URL!');
+      
+      const convertedData = canvas.toDataURL(item.format);
+      setImages(prev => prev.map(img => img.id === item.id ? { 
+        ...img, 
+        convertedUrl: convertedData, 
+        isConverting: false 
+      } : img));
+      toast.success(`Converted ${item.name}`);
     };
   };
 
-  const getExtension = () => {
+  const convertAll = () => {
+    if (images.length === 0) return;
+    images.forEach(img => {
+      convertSingle({ ...img, format: globalFormat });
+    });
+  };
+
+  const updateFormatForIndex = (id: string, format: string) => {
+    setImages(prev => prev.map(img => img.id === id ? { ...img, format } : img));
+  };
+
+  const removeImage = (id: string) => {
+    setImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  const getExtension = (format: string) => {
     if (format === 'image/jpeg') return 'jpg';
     if (format === 'image/webp') return 'webp';
     return 'png';
   };
 
+  const formatSize = (bytes: number) => {
+    return (bytes / 1024).toFixed(1) + ' KB';
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <input type="file" accept="image/*" onChange={handleFile} className="input" />
-      {image && (
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <select value={format} onChange={(e) => setFormat(e.target.value)} className="input" style={{ width: '160px' }}>
-            <option value="image/jpeg">Convert to JPG</option>
-            <option value="image/png">Convert to PNG</option>
-            <option value="image/webp">Convert to WEBP</option>
-          </select>
-          <button onClick={handleConvert} className="btn btn-primary">Convert</button>
-        </div>
-      )}
-      {converted && (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', border: '2px dashed var(--color-border)', borderRadius: 'var(--radius-md)', padding: '2rem', textAlign: 'center', backgroundColor: 'var(--color-bg-subtle)' }}>
+        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-fg-muted)' }}>
+          Upload between 1 to 10 images to convert at once.
+        </p>
         <div>
-          <a href={converted} download={`${name}_converted.${getExtension()}`} className="btn btn-secondary">
-            Download Converted File
-          </a>
+          <button 
+            type="button" 
+            onClick={() => fileInputRef.current?.click()} 
+            className="btn btn-primary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            Select Images
+          </button>
+          <input 
+            type="file" 
+            ref={fileInputRef}
+            accept="image/*" 
+            multiple 
+            onChange={handleFiles} 
+            style={{ display: 'none' }} 
+          />
+        </div>
+      </div>
+
+      {images.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', padding: '1rem', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-bg-card)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Convert All To:</label>
+              <select 
+                value={globalFormat} 
+                onChange={(e) => {
+                  const fmt = e.target.value;
+                  setGlobalFormat(fmt);
+                  setImages(prev => prev.map(img => ({ ...img, format: fmt })));
+                }} 
+                className="input" 
+                style={{ width: '120px', padding: '4px 8px', fontSize: '0.8125rem' }}
+              >
+                <option value="image/jpeg">JPG</option>
+                <option value="image/png">PNG</option>
+                <option value="image/webp">WEBP</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={convertAll} className="btn btn-primary" style={{ fontSize: '0.8125rem', padding: '6px 12px' }}>Convert All</button>
+              <button 
+                onClick={() => setImages([])} 
+                className="btn btn-secondary" 
+                style={{ fontSize: '0.8125rem', padding: '6px 12px', color: 'var(--color-danger)' }}
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {images.map(img => (
+              <div 
+                key={img.id} 
+                className="card"
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between', 
+                  gap: '1rem', 
+                  padding: '0.75rem 1rem', 
+                  flexWrap: 'wrap'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '1 1 300px' }}>
+                  <img 
+                    src={img.preview} 
+                    alt={img.name} 
+                    style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--color-border)' }} 
+                  />
+                  <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{img.name}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-fg-muted)' }}>{formatSize(img.size)}</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <select 
+                    value={img.format} 
+                    onChange={(e) => updateFormatForIndex(img.id, e.target.value)} 
+                    className="input" 
+                    style={{ width: '100px', padding: '4px 8px', fontSize: '0.75rem' }}
+                  >
+                    <option value="image/jpeg">JPG</option>
+                    <option value="image/png">PNG</option>
+                    <option value="image/webp">WEBP</option>
+                  </select>
+
+                  <button 
+                    onClick={() => convertSingle(img)} 
+                    className="btn btn-primary" 
+                    disabled={img.isConverting}
+                    style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                  >
+                    {img.isConverting ? 'Converting...' : 'Convert'}
+                  </button>
+
+                  {img.convertedUrl && (
+                    <a 
+                      href={img.convertedUrl} 
+                      download={`${img.name}_converted.${getExtension(img.format)}`} 
+                      className="btn btn-secondary" 
+                      style={{ fontSize: '0.75rem', padding: '4px 10px', backgroundColor: 'rgba(0, 230, 118, 0.1)', color: 'var(--color-success)', border: '1px solid rgba(0, 230, 118, 0.2)' }}
+                    >
+                      Download
+                    </a>
+                  )}
+
+                  <button 
+                    onClick={() => removeImage(img.id)} 
+                    className="btn-icon" 
+                    style={{ color: 'var(--color-danger)', border: 'none', background: 'none', padding: '4px', cursor: 'pointer' }}
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

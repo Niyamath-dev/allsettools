@@ -161,7 +161,7 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
 
           {/* Programmatic FAQ markup section */}
           <div style={{ marginTop: '4rem' }}>
-            <h2 style={{ fontSize: '1.35rem', marginBottom: '1.5rem', border: 'none', padding: 0 }}>Frequently Asked Questions</h2>
+            <h2 style={{ fontSize: '1.35rem', marginBottom: '1.5rem', border: 'none', padding: 0 }}>FAQs</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {currentFaqs.map((faq, idx) => (
                 <div key={idx} className="card" style={{ padding: '1.25rem' }}>

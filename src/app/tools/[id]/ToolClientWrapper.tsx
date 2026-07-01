@@ -640,7 +640,7 @@ export default function ToolClientWrapper({ tool }: WrapperProps) {
                 <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginBottom: '1rem' }}>
                   <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', border: 'none', padding: 0 }}>
                     <Icon name="help-circle" style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} />
-                    Frequently Asked Questions
+                    FAQs
                   </h2>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     {seoData.faqs.map((faq, idx) => (
