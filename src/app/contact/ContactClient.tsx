@@ -148,7 +148,7 @@ export default function ContactClient() {
             <div style={{ fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
                 <strong style={{ color: 'var(--color-fg)' }}>Support Email:</strong>
-                <p style={{ color: 'var(--color-fg-muted)', fontSize: '0.8125rem', marginTop: '2px' }}>support@allsettools.dev</p>
+                <p style={{ color: 'var(--color-fg-muted)', fontSize: '0.8125rem', marginTop: '2px' }}>support@allsettools.com </p>
               </div>
               <div>
                 <strong style={{ color: 'var(--color-fg)' }}>Average Response:</strong>
@@ -192,7 +192,7 @@ export default function ContactClient() {
               <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
             </summary>
             <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
-              Yes, you can write directly to our technical support team at support@allsettools.dev for assistance with self-hosting, tools bugs, or sponsorship.
+              Yes, you can write directly to our technical support team at support@allsettools.com for assistance with self-hosting, tools bugs, or sponsorship.
             </p>
           </details>
 

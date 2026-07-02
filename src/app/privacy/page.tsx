@@ -12,7 +12,7 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <div className="container animate-fade-in" style={{ marginTop: '1rem', paddingBottom: '4rem' }}>
-      
+
       <Breadcrumb items={[
         { label: 'Home', url: '/' },
         { label: 'Privacy Policy' }
@@ -43,10 +43,10 @@ export default function PrivacyPage() {
       </section>
 
       <div className="tool-container">
-        
+
         {/* Policy Content */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          
+
           <div className="card" style={{ padding: '2rem', gap: '1.25rem' }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>1. Zero Data Transmission Policy</h3>
             <p style={{ fontSize: '0.875rem', lineHeight: '1.6', margin: 0, color: 'var(--color-fg-muted)' }}>
@@ -97,7 +97,7 @@ export default function PrivacyPage() {
           <div className="card" style={{ padding: '2rem', gap: '1.25rem' }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>6. Contact & Data Concerns</h3>
             <p style={{ fontSize: '0.875rem', lineHeight: '1.6', margin: 0, color: 'var(--color-fg-muted)' }}>
-              If you have any questions regarding our local storage usage, security protocols, or privacy practices, you can submit feedback directly via our feedback page or reach us at <strong style={{ color: 'var(--color-fg)' }}>support@allsettools.dev</strong>.
+              If you have any questions regarding our local storage usage, security protocols, or privacy practices, you can submit feedback directly via our feedback page or reach us at <strong style={{ color: 'var(--color-fg)' }}>support@allsettools.com</strong>.
             </p>
           </div>
 
