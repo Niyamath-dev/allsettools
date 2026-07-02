@@ -39,6 +39,7 @@ export default function AdminDashboard() {
 
   // Check login state on mount
   useEffect(() => {
+    console.log("[Admin Debug] Configured Email:", ADMIN_EMAIL);
     const session = sessionStorage.getItem('allsettools_admin_session');
     if (session === 'true') {
       setIsLoggedIn(true);
