@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: tool.name,
         description: tool.description,
-        url: `https://allsettools.dev/tools/${tool.id}`,
+        url: `https://allsettools.com/tools/${tool.id}`,
       }
     };
   }
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: category.name,
       description: `Access premium 100% offline-ready ${category.name.toLowerCase()} tools. ${category.description} Free, instant, and private browser-local calculations.`,
       alternates: {
-        canonical: `https://allsettools.dev/tools/${id}`
+        canonical: `https://allsettools.com/tools/${id}`
       }
     };
   }

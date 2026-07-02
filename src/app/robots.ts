@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin', '/api/'],
     },
-    sitemap: 'https://allsettools.dev/sitemap.xml',
+    sitemap: 'https://allsettools.com/sitemap.xml',
   };
 }

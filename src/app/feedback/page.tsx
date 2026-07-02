@@ -13,12 +13,12 @@ export const metadata: Metadata = {
     "submit platform rating"
   ],
   alternates: {
-    canonical: "https://allsettools.dev/feedback",
+    canonical: "https://allsettools.com/feedback",
   },
   openGraph: {
     title: "Submit Feedback",
     description: "Share your experience with AllSetTools! Review our online developer utilities, suggest new tool request integrations, or submit feedback to help improve the platform.",
-    url: "https://allsettools.dev/feedback",
+    url: "https://allsettools.com/feedback",
     siteName: "AllSetTools",
     type: "website",
   }

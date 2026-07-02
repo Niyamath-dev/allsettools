@@ -135,14 +135,14 @@ export default function AdminClient() {
       const payload = type === 'contact' ? {
         id: 'test-' + Math.random().toString(36).substring(2, 6),
         name: 'Test Name (Admin)',
-        email: 'test@allsettools.dev',
+        email: 'test@allsettools.com',
         subject: 'Connection Verification',
         message: 'This is a test connection request from AllSetTools admin integrations tab.',
         submittedAt: new Date().toLocaleString()
       } : {
         id: 'test-' + Math.random().toString(36).substring(2, 6),
         name: 'Test Name (Admin)',
-        email: 'test@allsettools.dev',
+        email: 'test@allsettools.com',
         tool: 'admin-console',
         rating: 5,
         comment: 'This is a test feedback submission from AllSetTools admin integrations tab.',
@@ -207,7 +207,7 @@ export default function AdminClient() {
                 value={authEmail}
                 onChange={e => setAuthEmail(e.target.value)}
                 className="input"
-                placeholder="admin@allsettools.dev"
+                placeholder="admin@allsettools.com"
                 required
               />
             </div>

@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
     
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@allsettools.dev';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@allsettools.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'AdminPass123';
     
     const emailMatch = email === adminEmail;

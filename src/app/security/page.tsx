@@ -88,7 +88,7 @@ export default function SecurityPage() {
             </p>
             <ul style={{ paddingLeft: '1.25rem', margin: 0, fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', color: 'var(--color-fg-muted)' }}>
               <li><strong>Do Not Disclose Publicly:</strong> Contact us privately to allow time for hotfixes.</li>
-              <li><strong>Reporting Channel:</strong> Email us a summary at <strong style={{ color: 'var(--color-fg)' }}>security@allsettools.dev</strong>. Please include a brief description of the issue and steps to reproduce.</li>
+              <li><strong>Reporting Channel:</strong> Email us a summary at <strong style={{ color: 'var(--color-fg)' }}>security@allsettools.com</strong>. Please include a brief description of the issue and steps to reproduce.</li>
               <li><strong>Hotfixes:</strong> We aim to audit and publish patches for all critical vulnerabilities within 48 hours of notification.</li>
             </ul>
           </div>

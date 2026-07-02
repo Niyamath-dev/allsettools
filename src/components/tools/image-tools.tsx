@@ -533,7 +533,7 @@ export const ImageToBase64: React.FC = () => {
 
 // 6. QR Code Generator
 export const QRCodeGenerator: React.FC = () => {
-  const [text, setText] = useState('https://allsettools.dev');
+  const [text, setText] = useState('https://allsettools.com');
   const [qrUrl, setQrUrl] = useState('');
 
   const generateQR = () => {
@@ -1141,7 +1141,7 @@ export const QRCodeScanner: React.FC = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      setResult('https://allsettools.dev/workspace/qr-decoder-output\n\n[Decoded Payload]: "Welcome to AllSetTools Workspace Catalog"');
+      setResult('https://allsettools.com/workspace/qr-decoder-output\n\n[Decoded Payload]: "Welcome to AllSetTools Workspace Catalog"');
       toast.success('QR code scanned and decoded successfully!');
     }, 1000);
   };

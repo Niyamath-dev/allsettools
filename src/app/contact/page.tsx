@@ -13,12 +13,12 @@ export const metadata: Metadata = {
     "allsettools contact"
   ],
   alternates: {
-    canonical: "https://allsettools.dev/contact",
+    canonical: "https://allsettools.com/contact",
   },
   openGraph: {
     title: "Contact Us",
     description: "Get in touch with the AllSetTools team. Request new developer utility tools, report bugs, ask support questions, or contact us for partnership opportunities.",
-    url: "https://allsettools.dev/contact",
+    url: "https://allsettools.com/contact",
     siteName: "AllSetTools",
     type: "website",
   }

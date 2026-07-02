@@ -77,13 +77,13 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
     "@type": "ItemList",
     "name": `${category.name} Tools Catalogue`,
     "description": category.description,
-    "url": `https://allsettools.dev/tools/${category.id}`,
+    "url": `https://allsettools.com/tools/${category.id}`,
     "numberOfItems": categoryTools.length,
     "itemListElement": categoryTools.map((t, idx) => ({
       "@type": "ListItem",
       "position": idx + 1,
       "name": t.name,
-      "url": `https://allsettools.dev/tools/${t.id}`
+      "url": `https://allsettools.com/tools/${t.id}`
     }))
   };
 

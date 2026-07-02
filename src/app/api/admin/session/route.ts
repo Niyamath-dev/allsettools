@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 export async function GET() {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@allsettools.dev';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@allsettools.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'AdminPass123';
     
     // Expected token signature

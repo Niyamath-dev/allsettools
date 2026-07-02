@@ -64,7 +64,7 @@ export const MetaTagGenerator: React.FC = () => {
         <div>
           <label className="label">Google Search Results Mockup</label>
           <div className="card" style={{ padding: '1.25rem', backgroundColor: '#0d0d0d', border: '1px solid var(--color-border)' }}>
-            <span style={{ fontSize: '0.75rem', color: '#8e9196', display: 'block', marginBottom: '2px' }}>https://allsettools.dev</span>
+            <span style={{ fontSize: '0.75rem', color: '#8e9196', display: 'block', marginBottom: '2px' }}>https://allsettools.com</span>
             <h4 style={{ fontSize: '1.25rem', color: '#8ab4f8', fontWeight: 'normal', margin: '0 0 4px 0', cursor: 'pointer', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title || 'Please enter title'}</h4>
             <p style={{ fontSize: '0.875rem', color: '#bdc1c6', lineHeight: '1.4', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{desc || 'Please enter description'}</p>
           </div>
@@ -82,7 +82,7 @@ export const MetaTagGenerator: React.FC = () => {
 
 // 2. Sitemap Generator
 export const SitemapGenerator: React.FC = () => {
-  const [domain, setDomain] = useState('https://allsettools.dev');
+  const [domain, setDomain] = useState('https://allsettools.com');
   const [paths, setPaths] = useState('/\n/blog\n/admin\n/privacy');
   const [freq, setFreq] = useState('weekly');
   const [output, setOutput] = useState('');
@@ -140,7 +140,7 @@ export const SitemapGenerator: React.FC = () => {
 
 // 3. Robots.txt Generator
 export const RobotsTxtGenerator: React.FC = () => {
-  const [sitemap, setSitemap] = useState('https://allsettools.dev/sitemap.xml');
+  const [sitemap, setSitemap] = useState('https://allsettools.com/sitemap.xml');
   const [userAgent, setUserAgent] = useState('*');
   const [disallow, setDisallow] = useState('/admin\n/api');
   const [output, setOutput] = useState('');
@@ -256,8 +256,8 @@ export const KeywordDensityChecker: React.FC = () => {
 export const OpenGraphGenerator: React.FC = () => {
   const [title, setTitle] = useState('AllSetTools Workspace');
   const [type, setType] = useState('website');
-  const [url, setUrl] = useState('https://allsettools.dev');
-  const [img, setImg] = useState('https://allsettools.dev/og-cover.png');
+  const [url, setUrl] = useState('https://allsettools.com');
+  const [img, setImg] = useState('https://allsettools.com/og-cover.png');
   const [output, setOutput] = useState('');
 
   useEffect(() => {
@@ -588,7 +588,7 @@ export const UTMBuilder: React.FC = () => {
 export const SERPPreview: React.FC = () => {
   const [title, setTitle] = useState('AllSetTools - Free All-In-One Online Web Tools Platform');
   const [description, setDescription] = useState('Free, high-performance, and secure online tools. Dev, text, formatting, image compression, sitemaps, and calculators.');
-  const [url, setUrl] = useState('https://allsettools.dev/tools/serp-preview');
+  const [url, setUrl] = useState('https://allsettools.com/tools/serp-preview');
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
 
   return (

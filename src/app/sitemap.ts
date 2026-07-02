@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next';
 import { TOOLS, CATEGORIES } from '@/lib/registry';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.SITE_URL || 'https://deeppink-otter-891003.hostingersite.com';
+  const baseUrl = (process.env.SITE_URL || 'https://allsettools.com').replace(/\/$/, '');
 
   // Core indexable pages (excluding private admin console)
   const corePages = [

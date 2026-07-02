@@ -99,7 +99,7 @@ export const ProtectPDF: React.FC = () => {
         allowModifying
       });
 
-      const blob = new Blob([encryptedBytes], { type: 'application/pdf' });
+      const blob = new Blob([encryptedBytes as any], { type: 'application/pdf' });
       setDownloadUrl(URL.createObjectURL(blob));
       toast.success('PDF protected successfully!');
     } catch (err: any) {
@@ -275,7 +275,7 @@ export const UnlockPDF: React.FC = () => {
       const pdfBytes = new Uint8Array(buffer);
 
       const decryptedBytes = await decryptPDF(pdfBytes, password);
-      const blob = new Blob([decryptedBytes], { type: 'application/pdf' });
+      const blob = new Blob([decryptedBytes as any], { type: 'application/pdf' });
       setDownloadUrl(URL.createObjectURL(blob));
       toast.success('PDF unlocked successfully!');
     } catch (err: any) {
@@ -426,7 +426,7 @@ export const MergePDF: React.FC = () => {
       }
 
       const mergedPdfBytes = await mergedPdf.save();
-      const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([mergedPdfBytes as any], { type: 'application/pdf' });
       setDownloadUrl(URL.createObjectURL(blob));
       toast.success('PDFs merged successfully!');
     } catch (err: any) {
@@ -611,7 +611,7 @@ export const SplitPDF: React.FC = () => {
         copiedPages.forEach((page) => splitDoc.addPage(page));
 
         const splitBytes = await splitDoc.save();
-        const blob = new Blob([splitBytes], { type: 'application/pdf' });
+        const blob = new Blob([splitBytes as any], { type: 'application/pdf' });
         setRangeDownloadUrl(URL.createObjectURL(blob));
         toast.success('Selected pages extracted successfully!');
       } else {
@@ -625,7 +625,7 @@ export const SplitPDF: React.FC = () => {
           singleDoc.addPage(copiedPage);
 
           const singleBytes = await singleDoc.save();
-          const blob = new Blob([singleBytes], { type: 'application/pdf' });
+          const blob = new Blob([singleBytes as any], { type: 'application/pdf' });
           links.push({
             pageNumber: i + 1,
             url: URL.createObjectURL(blob)
@@ -834,7 +834,7 @@ export const PDFMetadataViewer: React.FC = () => {
       pdf.setKeywords(metadata.keywords.split(',').map(s => s.trim()).filter(Boolean));
 
       const modifiedBytes = await pdf.save();
-      const blob = new Blob([modifiedBytes], { type: 'application/pdf' });
+      const blob = new Blob([modifiedBytes as any], { type: 'application/pdf' });
       setDownloadUrl(URL.createObjectURL(blob));
       toast.success('Metadata updated successfully!');
     } catch (err) {
@@ -1086,7 +1086,7 @@ export const ImageToPDF: React.FC = () => {
       }
 
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
       setDownloadUrl(URL.createObjectURL(blob));
       toast.success('Images converted to PDF successfully!');
     } catch (err) {
