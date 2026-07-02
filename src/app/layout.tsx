@@ -24,8 +24,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "AllSetTools - Free All-In-One Online Web Tools Platform",
-    template: "%s",
+    default: "AllSetTools | Free All-In-One Online Web Tools Platform",
+    template: "%s | AllSetTools",
   },
   description: "Free, high-performance, and secure online tools. Dev, text, formatting, image compression, AI tag generation, sitemaps, and financial calculators client-side.",
   metadataBase: new URL("https://allsettools.dev"),

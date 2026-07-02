@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import ContactClient from './ContactClient';
 
 export const metadata: Metadata = {
-  title: "Contact Us - Support & Tool Requests | AllSetTools",
+  title: "Contact Us – Support & Tool Requests",
   description: "Get in touch with the AllSetTools team. Request new developer utility tools, report bugs, ask support questions, or contact us for partnership opportunities.",
   keywords: [
     "contact allsettools",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     canonical: "https://allsettools.dev/contact",
   },
   openGraph: {
-    title: "Contact Us - Support & Tool Requests | AllSetTools",
+    title: "Contact Us – Support & Tool Requests",
     description: "Get in touch with the AllSetTools team. Request new developer utility tools, report bugs, ask support questions, or contact us for partnership opportunities.",
     url: "https://allsettools.dev/contact",
     siteName: "AllSetTools",

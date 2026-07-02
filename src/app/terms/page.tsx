@@ -5,7 +5,7 @@ import { Icon } from '@/components/Icons';
 import { Breadcrumb } from '@/components/Breadcrumb';
 
 export const metadata = {
-  title: "Terms of Service | AllSetTools",
+  title: "Terms of Service – Free Usage Rules & Open Source Standalone Runs",
   description: "Read the AllSetTools Terms of Service. Understand the terms, liability disclaimers, and payload ownership clauses governing your use of our platform."
 };
 

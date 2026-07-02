@@ -5,7 +5,7 @@ import { Icon } from '@/components/Icons';
 import { Breadcrumb } from '@/components/Breadcrumb';
 
 export const metadata = {
-  title: "Privacy Policy | AllSetTools",
+  title: "Privacy Policy – 100% Safe Browser-Local Data Processing",
   description: "Read the AllSetTools Privacy Policy. Learn about our 100% client-side, zero-server data processing model that ensures absolute security and privacy."
 };
 
