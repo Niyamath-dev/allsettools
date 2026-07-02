@@ -6,7 +6,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { Icon } from '@/components/Icons';
 
 export const metadata = {
-  title: 'Tools Directories – Browse Free Web Utilities by Category',
+  title: 'Tools Directories',
   description: 'Browse the full catalog of free developer tools, text converters, image compressors, SEO checklists, and financial calculators.',
 };
 

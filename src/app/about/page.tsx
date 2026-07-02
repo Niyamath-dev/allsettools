@@ -4,7 +4,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'About Us – Learn About Our Secure Web Tools Mission',
+  title: 'About Us',
   description: 'Learn more about AllSetTools, the free all-in-one client-side developer utility platform. Built for privacy, simplicity, and speed.',
 };
 

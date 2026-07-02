@@ -5,7 +5,7 @@ import { Icon } from '@/components/Icons';
 import { Breadcrumb } from '@/components/Breadcrumb';
 
 export const metadata = {
-  title: "Security Policy – Zero Data Storage & Sandbox Environment",
+  title: "Security Policy",
   description: "Read the AllSetTools Security Policy. Learn about our local browser sandbox, HTTPS enforcement, daily CVE scans, and vulnerability disclosure protocol."
 };
 

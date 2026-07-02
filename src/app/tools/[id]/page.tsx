@@ -22,13 +22,6 @@ export async function generateStaticParams() {
   return [...toolParams, ...categoryParams];
 }
 
-// Helper to extract a short SEO benefit from a description
-function getSeoBenefit(description: string): string {
-  let benefit = description.split(/[.!?]/)[0].trim();
-  benefit = benefit.replace(/^(Free\s+|Online\s+|Client-side\s+)/i, '');
-  return benefit.charAt(0).toUpperCase() + benefit.slice(1);
-}
-
 // Page SEO Metadata Generator for both tools and categories
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
@@ -36,13 +29,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // 1. Resolve Tool Metadata
   const tool = getToolById(id);
   if (tool) {
-    const benefit = getSeoBenefit(tool.description);
     return {
-      title: `${tool.name} – ${benefit}`,
+      title: tool.name,
       description: tool.description,
       keywords: [...tool.keywords, 'free online tool', 'allsettools'],
       openGraph: {
-        title: `${tool.name} – ${benefit}`,
+        title: tool.name,
         description: tool.description,
         url: `https://allsettools.dev/tools/${tool.id}`,
       }
@@ -52,9 +44,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // 2. Resolve Category Metadata
   const category = CATEGORIES.find(c => c.id === id);
   if (category) {
-    const benefit = getSeoBenefit(category.description);
     return {
-      title: `${category.name} – ${benefit}`,
+      title: category.name,
       description: `Access premium 100% offline-ready ${category.name.toLowerCase()} tools. ${category.description} Free, instant, and private browser-local calculations.`,
       alternates: {
         canonical: `https://allsettools.dev/tools/${id}`
