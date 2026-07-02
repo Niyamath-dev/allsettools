@@ -156,13 +156,6 @@ export default function ContactClient() {
               </div>
             </div>
           </div>
-
-          <div className="card" style={{ padding: '1.25rem', backgroundColor: 'var(--color-bg-subtle)', borderStyle: 'dashed' }}>
-            <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>Self-Hosting?</h4>
-            <p style={{ fontSize: '0.75rem', lineHeight: '1.5' }}>
-              AllSetTools is open source and supports standalone Docker deployments. Check out our installation guides inside the README file.
-            </p>
-          </div>
         </aside>
 
       </div>
