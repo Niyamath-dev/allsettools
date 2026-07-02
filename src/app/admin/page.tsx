@@ -16,35 +16,26 @@ interface FeedbackLog {
   submittedAt: string;
 }
 
-interface AdminUser {
-  email: string;
-  passwordHash: string;
-}
-
-const PRE_SEEDED_ADMIN = {
-  email: 'admin@allsettools.dev',
-  password: 'AdminPass123'
-};
-
-const SECRET_REGISTRATION_PASSCODE = 'ALLSET_SECURE_2026';
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@allsettools.dev';
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'AdminPass123';
 
 export default function AdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
   
   // Auth Form State
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
-  const [authPasscode, setAuthPasscode] = useState('');
 
   // Dashboard Active Tab
-  const [activeTab, setActiveTab] = useState<'analytics' | 'tools' | 'feedback'>('analytics');
-  
-  // Analytics State
-  const [stats, setStats] = useState({ totalOperations: 0, totalFavs: 0, userSince: 'Today' });
+  const [activeTab, setActiveTab] = useState<'tools' | 'feedback' | 'integrations'>('feedback');
   
   // Feedback State
   const [feedbacks, setFeedbacks] = useState<FeedbackLog[]>([]);
+
+  // Google Sheets Integration State
+  const [sheetUrl, setSheetUrl] = useState('');
+  const [testingContact, setTestingContact] = useState(false);
+  const [testingFeedback, setTestingFeedback] = useState(false);
 
   // Check login state on mount
   useEffect(() => {
@@ -54,18 +45,12 @@ export default function AdminDashboard() {
     }
 
     try {
-      // Load Analytics
-      const ops = localStorage.getItem('allsettools_usage_count') || '0';
-      const favs = JSON.parse(localStorage.getItem('allsettools_favorites') || '[]');
-      setStats({
-        totalOperations: parseInt(ops),
-        totalFavs: favs.length,
-        userSince: new Date().toLocaleDateString()
-      });
-
       // Load Feedback
       const logs = JSON.parse(localStorage.getItem('allsettools_feedback_logs') || '[]');
       setFeedbacks(logs);
+
+      // Load Google Sheets Settings
+      setSheetUrl(localStorage.getItem('allsettools_google_sheet_url') || localStorage.getItem('allsettools_contact_sheet_url') || '');
     } catch (e) {
       console.error(e);
     }
@@ -79,8 +64,8 @@ export default function AdminDashboard() {
       return;
     }
 
-    // 1. Check against pre-seeded admin
-    if (authEmail === PRE_SEEDED_ADMIN.email && authPassword === PRE_SEEDED_ADMIN.password) {
+    // Check against configured admin credentials
+    if (authEmail === ADMIN_EMAIL && authPassword === ADMIN_PASSWORD) {
       sessionStorage.setItem('allsettools_admin_session', 'true');
       setIsLoggedIn(true);
       toast.success('Successfully logged in as Admin!');
@@ -88,65 +73,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    // 2. Check against registered admins in LocalStorage
-    try {
-      const registeredUsers: AdminUser[] = JSON.parse(localStorage.getItem('allsettools_admin_users') || '[]');
-      const found = registeredUsers.find(u => u.email === authEmail && u.passwordHash === authPassword);
-      if (found) {
-        sessionStorage.setItem('allsettools_admin_session', 'true');
-        setIsLoggedIn(true);
-        toast.success('Successfully logged in!');
-        setAuthPassword('');
-        return;
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
     toast.error('Invalid email or password.');
-  };
-
-  // Handle Register
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!authEmail || !authPassword || !authPasscode) {
-      toast.error('All fields are required.');
-      return;
-    }
-
-    if (authPasscode !== SECRET_REGISTRATION_PASSCODE) {
-      toast.error('Invalid Registration Passcode.');
-      return;
-    }
-
-    try {
-      const registeredUsers: AdminUser[] = JSON.parse(localStorage.getItem('allsettools_admin_users') || '[]');
-      
-      // Check if user already exists
-      if (authEmail === PRE_SEEDED_ADMIN.email || registeredUsers.some(u => u.email === authEmail)) {
-        toast.error('Admin email is already registered.');
-        return;
-      }
-
-      const newUser: AdminUser = {
-        email: authEmail,
-        passwordHash: authPassword
-      };
-
-      registeredUsers.push(newUser);
-      localStorage.setItem('allsettools_admin_users', JSON.stringify(registeredUsers));
-      sessionStorage.setItem('allsettools_admin_session', 'true');
-      setIsLoggedIn(true);
-      toast.success('Registration successful! Logged in.');
-      
-      // Reset form
-      setAuthEmail('');
-      setAuthPassword('');
-      setAuthPasscode('');
-    } catch (e) {
-      console.error(e);
-      toast.error('Registration failed.');
-    }
   };
 
   // Handle Logout
@@ -161,6 +88,68 @@ export default function AdminDashboard() {
     setFeedbacks([]);
     localStorage.removeItem('allsettools_feedback_logs');
     toast.show('Feedback logs cleared.', 'info');
+  };
+
+  // Save Webhook URLs
+  const saveUrls = () => {
+    const trimmed = sheetUrl.trim();
+    localStorage.setItem('allsettools_google_sheet_url', trimmed);
+    localStorage.setItem('allsettools_contact_sheet_url', trimmed); // backcompat
+    localStorage.setItem('allsettools_feedback_sheet_url', trimmed); // backcompat
+    toast.success('Google Sheets integration settings saved!');
+  };
+
+  // Test Connection to Webhook
+  const testConnection = async (type: 'contact' | 'feedback') => {
+    const url = sheetUrl.trim();
+    if (!url) {
+      toast.error(`Please provide a Google Sheets Web App URL first.`);
+      return;
+    }
+    
+    if (type === 'contact') setTestingContact(true);
+    else setTestingFeedback(true);
+
+    try {
+      const payload = type === 'contact' ? {
+        id: 'test-' + Math.random().toString(36).substring(2, 6),
+        name: 'Test Name (Admin)',
+        email: 'test@allsettools.dev',
+        subject: 'Connection Verification',
+        message: 'This is a test connection request from AllSetTools admin integrations tab.',
+        submittedAt: new Date().toLocaleString()
+      } : {
+        id: 'test-' + Math.random().toString(36).substring(2, 6),
+        name: 'Test Name (Admin)',
+        email: 'test@allsettools.dev',
+        tool: 'admin-console',
+        rating: 5,
+        comment: 'This is a test feedback submission from AllSetTools admin integrations tab.',
+        submittedAt: new Date().toLocaleDateString()
+      };
+
+      const res = await fetch(`/api/${type}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-sheet-url': url
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        toast.success('Connection verification successful! Row successfully appended.');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || 'Connection verification failed.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Connection test failed: ' + (err.message || 'Network error'));
+    } finally {
+      if (type === 'contact') setTestingContact(false);
+      else setTestingFeedback(false);
+    }
   };
 
   if (!isLoggedIn) {
@@ -185,99 +174,37 @@ export default function AdminDashboard() {
               Admin Access Gate
             </h1>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', margin: 0 }}>
-              {authTab === 'login' ? 'Sign in to access tools telemetry & reviews.' : 'Create a new secure admin account.'}
+              Sign in to access tools telemetry & reviews.
             </p>
           </div>
 
-          {/* Form Selector Tabs */}
-          <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
-            <button
-              onClick={() => setAuthTab('login')}
-              className={`btn ${authTab === 'login' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, fontSize: '0.8125rem', padding: '8px' }}
-            >
-              Sign In
+          <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label className="label" style={{ fontSize: '0.8125rem' }}>Admin Email</label>
+              <input
+                type="email"
+                value={authEmail}
+                onChange={e => setAuthEmail(e.target.value)}
+                className="input"
+                placeholder="admin@allsettools.dev"
+                required
+              />
+            </div>
+            <div>
+              <label className="label" style={{ fontSize: '0.8125rem' }}>Password</label>
+              <input
+                type="password"
+                value={authPassword}
+                onChange={e => setAuthPassword(e.target.value)}
+                className="input"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
+              Sign In to Console
             </button>
-            <button
-              onClick={() => setAuthTab('register')}
-              className={`btn ${authTab === 'register' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, fontSize: '0.8125rem', padding: '8px' }}
-            >
-              Register
-            </button>
-          </div>
-
-          {authTab === 'login' ? (
-            <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div>
-                <label className="label" style={{ fontSize: '0.8125rem' }}>Admin Email</label>
-                <input
-                  type="email"
-                  value={authEmail}
-                  onChange={e => setAuthEmail(e.target.value)}
-                  className="input"
-                  placeholder="admin@allsettools.dev"
-                  required
-                />
-              </div>
-              <div>
-                <label className="label" style={{ fontSize: '0.8125rem' }}>Password</label>
-                <input
-                  type="password"
-                  value={authPassword}
-                  onChange={e => setAuthPassword(e.target.value)}
-                  className="input"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
-                Sign In to Console
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div>
-                <label className="label" style={{ fontSize: '0.8125rem' }}>Admin Email</label>
-                <input
-                  type="email"
-                  value={authEmail}
-                  onChange={e => setAuthEmail(e.target.value)}
-                  className="input"
-                  placeholder="name@domain.com"
-                  required
-                />
-              </div>
-              <div>
-                <label className="label" style={{ fontSize: '0.8125rem' }}>Create Password</label>
-                <input
-                  type="password"
-                  value={authPassword}
-                  onChange={e => setAuthPassword(e.target.value)}
-                  className="input"
-                  placeholder="Secure password"
-                  required
-                />
-              </div>
-              <div>
-                <label className="label" style={{ fontSize: '0.8125rem' }}>Secret Passcode</label>
-                <input
-                  type="password"
-                  value={authPasscode}
-                  onChange={e => setAuthPasscode(e.target.value)}
-                  className="input"
-                  placeholder="Enter secret registration key"
-                  required
-                />
-                <span style={{ fontSize: '0.6875rem', color: 'var(--color-fg-muted)', marginTop: '4px', display: 'block' }}>
-                  Ask the project owner for the secure registration key code.
-                </span>
-              </div>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
-                Create Admin Account
-              </button>
-            </form>
-          )}
+          </form>
         </div>
       </div>
     );
@@ -303,77 +230,10 @@ export default function AdminDashboard() {
 
       {/* Tabs list */}
       <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px', marginBottom: '2rem' }}>
-        <button onClick={() => setActiveTab('analytics')} className={`btn ${activeTab === 'analytics' ? 'btn-primary' : 'btn-secondary'}`}>Analytics</button>
         <button onClick={() => setActiveTab('tools')} className={`btn ${activeTab === 'tools' ? 'btn-primary' : 'btn-secondary'}`}>Tool Manager</button>
         <button onClick={() => setActiveTab('feedback')} className={`btn ${activeTab === 'feedback' ? 'btn-primary' : 'btn-secondary'}`}>User Feedback</button>
+        <button onClick={() => setActiveTab('integrations')} className={`btn ${activeTab === 'integrations' ? 'btn-primary' : 'btn-secondary'}`}>Google Sheets Integration</button>
       </div>
-
-      {/* 1. ANALYTICS PANEL */}
-      {activeTab === 'analytics' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          {/* Highlight Cards */}
-          <div className="grid-cols-3">
-            <div className="card" style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '0.8125rem', color: 'var(--color-fg-muted)' }}>Total Executions</div>
-              <div style={{ fontSize: '2.25rem', fontWeight: 'bold', margin: '0.25rem 0' }}>{stats.totalOperations}</div>
-              <p style={{ fontSize: '0.75rem' }}>Client-side browser runs</p>
-            </div>
-            <div className="card" style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '0.8125rem', color: 'var(--color-fg-muted)' }}>Saved Favorites</div>
-              <div style={{ fontSize: '2.25rem', fontWeight: 'bold', margin: '0.25rem 0' }}>{stats.totalFavs}</div>
-              <p style={{ fontSize: '0.75rem' }}>Starred tools checklist</p>
-            </div>
-            <div className="card" style={{ padding: '1.5rem' }}>
-              <div style={{ fontSize: '0.8125rem', color: 'var(--color-fg-muted)' }}>Session Created</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0.75rem 0' }}>{stats.userSince}</div>
-              <p style={{ fontSize: '0.75rem' }}>Site session initial entry</p>
-            </div>
-          </div>
-
-          {/* Simple Custom styled monochrome bar chart */}
-          <div className="card" style={{ padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.15rem', marginBottom: '1.5rem' }}>Simulated Tool Category Metrics</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '4px' }}>
-                  <span>Developer Tools</span>
-                  <span>45% of total usage</span>
-                </div>
-                <div style={{ height: '8px', backgroundColor: 'var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '45%', backgroundColor: 'var(--color-fg)' }} />
-                </div>
-              </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '4px' }}>
-                  <span>Text Utilities</span>
-                  <span>25% of total usage</span>
-                </div>
-                <div style={{ height: '8px', backgroundColor: 'var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '25%', backgroundColor: 'var(--color-fg)' }} />
-                </div>
-              </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '4px' }}>
-                  <span>Image Compressor & Converters</span>
-                  <span>20% of total usage</span>
-                </div>
-                <div style={{ height: '8px', backgroundColor: 'var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '20%', backgroundColor: 'var(--color-fg)' }} />
-                </div>
-              </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '4px' }}>
-                  <span>SEO & Business Calculators</span>
-                  <span>10% of total usage</span>
-                </div>
-                <div style={{ height: '8px', backgroundColor: 'var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '10%', backgroundColor: 'var(--color-fg)' }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 2. TOOL MANAGER PANEL */}
       {activeTab === 'tools' && (
@@ -466,6 +326,168 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* 4. GOOGLE SHEETS INTEGRATION PANEL */}
+      {activeTab === 'integrations' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* Settings Card */}
+          <div className="card" style={{ padding: '2rem', gap: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', border: 'none', padding: 0 }}>Configure Webhook URLs</h3>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', margin: 0, marginTop: '-0.5rem' }}>
+              Add the Web App URLs generated from your Google Apps Script deployment.
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div>
+                <label className="label" style={{ fontWeight: 600 }}>Google Sheets Web App URL</label>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+                  <input
+                    type="url"
+                    value={sheetUrl}
+                    onChange={e => setSheetUrl(e.target.value)}
+                    className="input"
+                    placeholder="https://script.google.com/macros/s/.../exec"
+                    style={{ flex: 1 }}
+                  />
+                </div>
+                <small style={{ color: 'var(--color-fg-dimmed)', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
+                  Paste the single Web App URL copied from your Google Spreadsheet's Apps Script deployment.
+                </small>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--color-border)', paddingTop: '1.25rem' }}>
+                <label className="label" style={{ fontWeight: 600, marginBottom: '4px' }}>Test Integrations</label>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button
+                    onClick={() => testConnection('contact')}
+                    disabled={testingContact}
+                    className="btn btn-secondary"
+                    style={{ flex: 1 }}
+                  >
+                    {testingContact ? 'Testing Contact Sheet...' : 'Test Contact Form'}
+                  </button>
+                  <button
+                    onClick={() => testConnection('feedback')}
+                    disabled={testingFeedback}
+                    className="btn btn-secondary"
+                    style={{ flex: 1 }}
+                  >
+                    {testingFeedback ? 'Testing Feedback Sheet...' : 'Test Feedback Form'}
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid var(--color-border)', paddingTop: '1.25rem', marginTop: '0.5rem' }}>
+                <button onClick={saveUrls} className="btn btn-primary">
+                  Save Webhook Settings
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Guide Card */}
+          <div className="card" style={{ padding: '2rem', gap: '1.25rem' }}>
+            <h3 style={{ fontSize: '1.25rem', border: 'none', padding: 0 }}>Google Sheets Setup Instructions</h3>
+            
+            <div style={{ fontSize: '0.9rem', color: 'var(--color-fg-muted)', display: 'flex', flexDirection: 'column', gap: '1rem', lineHeight: '1.6' }}>
+              <div>
+                <strong style={{ color: 'var(--color-fg)' }}>Step 1: Create a Google Spreadsheet</strong>
+                <p style={{ margin: '4px 0 0 0' }}>Open your Google Drive, create a new spreadsheet, and name it (e.g. <code>AllSetTools Submissions</code>).</p>
+              </div>
+              
+              <div>
+                <strong style={{ color: 'var(--color-fg)' }}>Step 2: Open Extensions</strong>
+                <p style={{ margin: '4px 0 0 0' }}>In the spreadsheet menu, navigate to <strong>Extensions</strong> &rarr; <strong>Apps Script</strong>. This opens the Google Apps Script IDE.</p>
+              </div>
+
+              <div>
+                <strong style={{ color: 'var(--color-fg)' }}>Step 3: Paste the Deployment Code</strong>
+                <p style={{ margin: '4px 0 0 0' }}>Delete any starter template code in the Apps Script window and paste the code snippet below:</p>
+                <div style={{ position: 'relative', marginTop: '8px' }}>
+                  <pre style={{
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    padding: '1.25rem',
+                    borderRadius: 'var(--radius-md)',
+                    overflow: 'auto',
+                    maxHeight: '300px',
+                    fontSize: '0.75rem',
+                    fontFamily: 'var(--font-mono)',
+                    border: '1px solid var(--color-border)'
+                  }}>
+{`function doPost(e) {
+  try {
+    var rawData = e.postData.contents;
+    var data = JSON.parse(rawData);
+    
+    var doc = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet;
+    var headers = [];
+    
+    if (data.type === "contact") {
+      sheet = doc.getSheetByName("Contact Submissions") || doc.insertSheet("Contact Submissions");
+      headers = ["id", "submittedAt", "name", "email", "subject", "message"];
+    } else if (data.type === "feedback") {
+      sheet = doc.getSheetByName("User Feedback") || doc.insertSheet("User Feedback");
+      headers = ["id", "submittedAt", "name", "email", "tool", "rating", "comment"];
+    } else {
+      sheet = doc.getSheets()[0];
+      headers = Object.keys(data);
+    }
+    
+    // Create headers row if empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(headers);
+      sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#f3f4f6");
+    }
+    
+    // Build row data matches headers
+    var row = headers.map(function(h) {
+      return data[h] !== undefined ? data[h] : "";
+    });
+    
+    sheet.appendRow(row);
+    
+    return ContentService.createTextOutput(JSON.stringify({ "status": "success", "row": row }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ "status": "error", "message": err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`}
+                  </pre>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(`function doPost(e) {\n  try {\n    var rawData = e.postData.contents;\n    var data = JSON.parse(rawData);\n    \n    var doc = SpreadsheetApp.getActiveSpreadsheet();\n    var sheet;\n    var headers = [];\n    \n    if (data.type === "contact") {\n      sheet = doc.getSheetByName("Contact Submissions") || doc.insertSheet("Contact Submissions");\n      headers = ["id", "submittedAt", "name", "email", "subject", "message"];\n    } else if (data.type === "feedback") {\n      sheet = doc.getSheetByName("User Feedback") || doc.insertSheet("User Feedback");\n      headers = ["id", "submittedAt", "name", "email", "tool", "rating", "comment"];\n    } else {\n      sheet = doc.getSheets()[0];\n      headers = Object.keys(data);\n    }\n    \n    // Create headers row if empty\n    if (sheet.getLastRow() === 0) {\n      sheet.appendRow(headers);\n      sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#f3f4f6");\n    }\n    \n    // Build row data matches headers\n    var row = headers.map(function(h) {\n      return data[h] !== undefined ? data[h] : "";\n    });\n    \n    sheet.appendRow(row);\n    \n    return ContentService.createTextOutput(JSON.stringify({ "status": "success", "row": row }))\n      .setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({ "status": "error", "message": err.toString() }))\n      .setMimeType(ContentService.MimeType.JSON);\n  }\n}`);
+                      toast.success('Apps Script code copied to clipboard!');
+                    }}
+                    className="btn btn-secondary" 
+                    style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '0.75rem', padding: '4px 8px' }}
+                  >
+                    Copy Snippet
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <strong style={{ color: 'var(--color-fg)' }}>Step 4: Save & Deploy as Web App</strong>
+                <ul style={{ margin: '4px 0 0 0', paddingLeft: '20px' }}>
+                  <li>Click the floppy disk icon (Save) at the top of the editor.</li>
+                  <li>Click the blue <strong>Deploy</strong> button &rarr; <strong>New deployment</strong>.</li>
+                  <li>Click the gear icon (Select type) and select <strong>Web app</strong>.</li>
+                  <li>Set <strong>Execute as</strong> to <code>Me (your-email@gmail.com)</code>.</li>
+                  <li>Set <strong>Who has access</strong> to <code>Anyone</code>. <em style={{ fontSize: '0.8rem' }}>(This is required so the server API can submit entries without Google login)</em>.</li>
+                  <li>Click <strong>Deploy</strong>. Copy the generated <strong>Web app URL</strong>.</li>
+                </ul>
+              </div>
+
+              <div>
+                <strong style={{ color: 'var(--color-fg)' }}>Step 5: Verify the Integration</strong>
+                <p style={{ margin: '4px 0 0 0' }}>Paste the Web App URL into the configuration panel above, click <strong>Save Webhook Settings</strong>, and trigger a <strong>Test Connection</strong> to verify integration.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* FAQs Collapsible Accordion */}
       <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginTop: '3rem', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1.5rem', color: 'var(--color-fg)', border: 'none', padding: 0 }}>
@@ -498,7 +520,7 @@ export default function AdminDashboard() {
               <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
             </summary>
             <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
-              Yes. Access is gated behind a client-side login layer. Registering a new admin user requires entering a secret registration code key.
+              Yes. Access is gated behind a secure login portal using a single, unique administrator account email and password configured in your environment variables.
             </p>
           </details>
 

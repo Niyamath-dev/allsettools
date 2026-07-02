@@ -11,7 +11,7 @@ export default function ContactPage() {
   const [subject, setSubject] = useState('General Inquiry');
   const [message, setMessage] = useState('');
 
-  const submitContact = (e: React.FormEvent) => {
+  const submitContact = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !message) {
       toast.error('Please fill in all required fields.');
@@ -27,14 +27,55 @@ export default function ContactPage() {
       submittedAt: new Date().toLocaleString()
     };
 
+    // 1. Save locally as fallback
+    let localSaved = false;
     try {
       const existing = JSON.parse(localStorage.getItem('allsettools_contact_messages') || '[]');
       existing.push(payload);
       localStorage.setItem('allsettools_contact_messages', JSON.stringify(existing));
-      toast.success('Your message has been sent successfully!');
+      localSaved = true;
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to register inquiry.');
+      console.error('Local Storage error:', err);
+    }
+
+    // 2. Post to API to sync with Google Sheets
+    try {
+      const customUrl = localStorage.getItem('allsettools_google_sheet_url') || localStorage.getItem('allsettools_contact_sheet_url') || '';
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (customUrl) {
+        headers['x-sheet-url'] = customUrl;
+      }
+
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        toast.success('Your message has been sent!');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        const isNotConfigured = res.status === 400 || (errorData.error && errorData.error.includes('not configured'));
+        if (isNotConfigured) {
+          if (localSaved) {
+            toast.success('Message saved locally. (Google Sheets not configured in dashboard)');
+          } else {
+            toast.error('Failed to register inquiry.');
+          }
+        } else {
+          toast.error(errorData.error || 'Failed to sync to Google Sheets.');
+        }
+      }
+    } catch (err) {
+      console.error('Google Sheets sync error:', err);
+      if (localSaved) {
+        toast.success('Message saved locally (Failed to sync with Google Sheets).');
+      } else {
+        toast.error('Failed to submit message.');
+      }
     }
 
     setName('');
@@ -57,7 +98,7 @@ export default function ContactPage() {
       </div>
 
       <div className="tool-container">
-        
+
         {/* Contact Form */}
         <form onSubmit={submitContact} className="card" style={{ padding: '2rem', gap: '1.25rem' }}>
           <h3 style={{ fontSize: '1.25rem', border: 'none', padding: 0 }}>Send a Message</h3>
@@ -103,7 +144,7 @@ export default function ContactPage() {
         <aside style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="card" style={{ padding: '1.5rem', gap: '1rem' }}>
             <h4 style={{ fontSize: '1rem', fontWeight: 600, borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>Contact Details</h4>
-            
+
             <div style={{ fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
                 <strong style={{ color: 'var(--color-fg)' }}>Support Email:</strong>
@@ -168,7 +209,7 @@ export default function ContactPage() {
               <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
             </summary>
             <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
-              For layout validation, contact requests are securely logged locally in your current browser session cache database and never uploaded to remote databases.
+              Submissions are automatically synced to your configured Google Sheets spreadsheet via secure API integration. If no integration is active, they are securely saved locally inside your browser session database.
             </p>
           </details>
         </div>

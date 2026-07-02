@@ -17,7 +17,8 @@ export const toast = {
     toastListeners.forEach(cb => cb({ id, text, type }));
   },
   success: (text: string) => toast.show(text, 'success'),
-  error: (text: string) => toast.show(text, 'error')
+  error: (text: string) => toast.show(text, 'error'),
+  info: (text: string) => toast.show(text, 'info')
 };
 
 export const ToastProvider: React.FC = () => {

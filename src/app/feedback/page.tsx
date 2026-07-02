@@ -13,7 +13,7 @@ export default function UserFeedback() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
 
-  const submitFeedback = (e: React.FormEvent) => {
+  const submitFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment) {
       toast.error('Please enter a comment.');
@@ -30,14 +30,55 @@ export default function UserFeedback() {
       submittedAt: new Date().toLocaleDateString()
     };
 
+    // 1. Save locally as fallback
+    let localSaved = false;
     try {
       const logs = JSON.parse(localStorage.getItem('allsettools_feedback_logs') || '[]');
       logs.push(payload);
       localStorage.setItem('allsettools_feedback_logs', JSON.stringify(logs));
-      toast.success('Thank you! Your feedback has been received.');
+      localSaved = true;
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to log feedback.');
+      console.error('Local Storage error:', err);
+    }
+
+    // 2. Post to API to sync with Google Sheets
+    try {
+      const customUrl = localStorage.getItem('allsettools_google_sheet_url') || localStorage.getItem('allsettools_feedback_sheet_url') || '';
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (customUrl) {
+        headers['x-sheet-url'] = customUrl;
+      }
+
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        toast.success('Thank you! Your feedback has been received.');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        const isNotConfigured = res.status === 400 || (errorData.error && errorData.error.includes('not configured'));
+        if (isNotConfigured) {
+          if (localSaved) {
+            toast.success('Feedback saved locally. (Google Sheets not configured in dashboard)');
+          } else {
+            toast.error('Failed to log feedback.');
+          }
+        } else {
+          toast.error(errorData.error || 'Failed to sync to Google Sheets.');
+        }
+      }
+    } catch (err) {
+      console.error('Google Sheets sync error:', err);
+      if (localSaved) {
+        toast.success('Feedback saved locally (Failed to sync with Google Sheets).');
+      } else {
+        toast.error('Failed to submit feedback.');
+      }
     }
 
     setName('');
@@ -50,7 +91,7 @@ export default function UserFeedback() {
   return (
     <div className="container animate-fade-in" style={{ marginTop: '1rem' }}>
       <Breadcrumb items={[{ label: 'Home', url: '/' }, { label: 'Submit Feedback' }]} />
-      
+
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '0.5rem', border: 'none' }}>
           User Feedback System
@@ -140,7 +181,7 @@ export default function UserFeedback() {
               <span className="accent-color" style={{ fontSize: '0.8rem', opacity: 0.7 }}>▼</span>
             </summary>
             <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', cursor: 'default', margin: 0 }}>
-              Feedback ratings and comments are securely saved in your browser&apos;s LocalStorage session database for validation testing and demo purposes.
+              Feedback reviews are synced in real-time to your configured Google Sheets spreadsheet via webhook. They are also logged locally inside your browser session database for convenience.
             </p>
           </details>
 
