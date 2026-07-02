@@ -16,9 +16,6 @@ interface FeedbackLog {
   submittedAt: string;
 }
 
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@allsettools.dev';
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'AdminPass123';
-
 export default function AdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   
@@ -39,10 +36,19 @@ export default function AdminDashboard() {
 
   // Check login state on mount
   useEffect(() => {
-    const session = sessionStorage.getItem('allsettools_admin_session');
-    if (session === 'true') {
-      setIsLoggedIn(true);
-    }
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/admin/session');
+        const data = await res.json().catch(() => ({}));
+        if (data.loggedIn) {
+          setIsLoggedIn(true);
+        }
+      } catch (err) {
+        console.error('Session check failed:', err);
+      }
+    };
+
+    checkSession();
 
     try {
       // Load Feedback
@@ -54,31 +60,46 @@ export default function AdminDashboard() {
     } catch (e) {
       console.error(e);
     }
-  }, [isLoggedIn]);
+  }, []);
 
   // Handle Sign In
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authEmail || !authPassword) {
       toast.error('Please enter your email and password.');
       return;
     }
 
-    // Check against configured admin credentials
-    if (authEmail === ADMIN_EMAIL && authPassword === ADMIN_PASSWORD) {
-      sessionStorage.setItem('allsettools_admin_session', 'true');
-      setIsLoggedIn(true);
-      toast.success('Successfully logged in as Admin!');
-      setAuthPassword('');
-      return;
-    }
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: authEmail, password: authPassword }),
+      });
 
-    toast.error('Invalid email or password.');
+      if (res.ok) {
+        setIsLoggedIn(true);
+        toast.success('Successfully logged in as Admin!');
+        setAuthPassword('');
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        toast.error(errData.error || 'Invalid email or password.');
+      }
+    } catch (err) {
+      console.error('Sign-in network error:', err);
+      toast.error('Network error during login.');
+    }
   };
 
   // Handle Logout
-  const handleLogout = () => {
-    sessionStorage.removeItem('allsettools_admin_session');
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
     setIsLoggedIn(false);
     toast.show('Logged out successfully.', 'info');
   };
