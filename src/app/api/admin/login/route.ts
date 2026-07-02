@@ -10,7 +10,10 @@ export async function POST(request: Request) {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@allsettools.dev';
     const adminPassword = process.env.ADMIN_PASSWORD || 'AdminPass123';
     
-    if (email === adminEmail && password === adminPassword) {
+    const emailMatch = email === adminEmail;
+    const passwordMatch = password === adminPassword;
+    
+    if (emailMatch && passwordMatch) {
       // Generate a signed session token unique to these credentials
       const token = crypto.createHmac('sha256', adminPassword)
         .update(adminEmail + '-session-auth-2026')
