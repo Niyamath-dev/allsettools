@@ -1,6 +1,7 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import { Header } from "@/components/Header";
@@ -63,6 +64,22 @@ export default function RootLayout({
       style={{ scrollBehavior: 'smooth' }}
       suppressHydrationWarning={true}
     >
+      <head>
+        {/* Google tag (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-JESG6DQSEL"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-JESG6DQSEL');
+          `}
+        </Script>
+      </head>
       <body
         style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0 }}
         suppressHydrationWarning={true}
