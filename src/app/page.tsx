@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: {
     absolute: "AllSetTools | Free All-In-One Online Web Tools Platform"
   },
-  description: "Access 100+ free, fast, and secure client-side web tools. Includes JSON formatters, image compressors, AI tag generators, base64 encoders, and offline-ready developer utilities.",
+  description: "Access 200+ free, fast, and secure client-side web tools. Includes JSON formatters, image compressors, AI tag generators, base64 encoders, and offline-ready developer utilities.",
   keywords: [
     "online web tools",
     "developer utilities",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "AllSetTools - Free All-In-One Online Web Tools Platform",
-    description: "Access 100+ free, fast, and secure client-side web tools. Includes JSON formatters, image compressors, AI tag generators, base64 encoders, and offline-ready developer utilities.",
+    description: "Access 200+ free, fast, and secure client-side web tools. Includes JSON formatters, image compressors, AI tag generators, base64 encoders, and offline-ready developer utilities.",
     url: "https://allsettools.com",
     siteName: "AllSetTools",
     type: "website",
