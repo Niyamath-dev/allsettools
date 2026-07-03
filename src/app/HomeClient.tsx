@@ -487,7 +487,7 @@ export default function HomeClient() {
       )}
 
       {/* 8. TESTIMONIALS SECTION */}
-      {searchQuery.trim() === '' && (
+      {/* {searchQuery.trim() === '' && (
         <section style={{ marginBottom: '5.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '3.5rem' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', textAlign: 'center', border: 'none' }}>Loved by Developers Worldwide</h2>
           <p style={{ fontSize: '0.9rem', color: 'var(--color-fg-muted)', textAlign: 'center', marginBottom: '3rem' }}>
@@ -525,7 +525,7 @@ export default function HomeClient() {
             ))}
           </div>
         </section>
-      )}
+      )} */}
 
       {/* 9. CALL TO ACTION (CTA) */}
       {searchQuery.trim() === '' && (
