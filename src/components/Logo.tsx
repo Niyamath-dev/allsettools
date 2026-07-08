@@ -1,5 +1,6 @@
 // src/components/Logo.tsx
 import React from 'react';
+import Image from 'next/image';
 import LogoImage from '@/app/ALL Set Tools logo.png';
 
 interface LogoProps {
@@ -20,8 +21,8 @@ export const Logo: React.FC<LogoProps> = ({ size = 28, showText = true, classNam
           transition: 'all 0.3s ease'
         }}
       >
-        <img
-          src={LogoImage.src}
+        <Image
+          src={LogoImage}
           alt="AllSetTools"
           style={{
             height: '100%',
@@ -30,6 +31,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 28, showText = true, classNam
             objectFit: 'cover',
             objectPosition: 'left'
           }}
+          priority
           className="logo-img"
         />
       </div>

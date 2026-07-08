@@ -1,0 +1,101 @@
+# AllSetTools
+
+AllSetTools is a high-performance, client-side, offline-ready web utilities platform containing 200+ free web tools. 
+
+All operations run 100% locally inside the user's web browser memory. No data inputs, keys, strings, or uploaded files are ever sent to any remote servers, providing maximum privacy and zero latency.
+
+- Website: https://allsettools.com
+- Directory: https://allsettools.com/tools
+- GitHub/Docs: https://allsettools.com/about
+
+## Core Features & Execution
+- **Zero Server Overhead**: Compiles client-side using JavaScript, WebAssembly, and HTML5 Canvas engines.
+- **Offline Capable**: Once the page is loaded, most tools function completely offline.
+- **Privacy First**: Zero databases, cookie-less processing of user values, and zero telemetry of input texts.
+
+## Tool Categories & Entry Points
+
+### 1. Developer Utilities
+Code formatters, encoders, parsers, and minifiers.
+- Entrypoint: https://allsettools.com/tools/dev
+- Popular tools:
+  - JSON Formatter: `/tools/json-formatter`
+  - Base64 Encoder/Decoder: `/tools/base64-encode-decode`
+  - JWT Decoder: `/tools/jwt-decoder`
+  - SQL Formatter: `/tools/sql-formatter`
+  - YAML Validator: `/tools/yaml-formatter-validator`
+  - Regex Tester: `/tools/regex-tester`
+
+### 2. Text & Content Tools
+Inspect, clean, rewrite, and format text strings.
+- Entrypoint: https://allsettools.com/tools/text
+- Popular tools:
+  - Word Counter: `/tools/word-counter`
+  - Text Diff Checker: `/tools/text-compare`
+  - Multi-Language Translator (client API): `/tools/multi-language-translator`
+  - Lorem Ipsum Generator: `/tools/lorem-ipsum-generator`
+
+### 3. Image Optimization
+Compress, crop, scale, and convert images client-side.
+- Entrypoint: https://allsettools.com/tools/image
+- Popular tools:
+  - Image Compressor (Canvas WebP): `/tools/image-compressor`
+  - Image Resizer: `/tools/image-resizer`
+  - Image Cropper: `/tools/image-cropper`
+  - QR Code Generator: `/tools/qr-code-generator`
+  - Background Remover: `/tools/background-remover`
+
+### 4. PDF Management
+Edit, split, merge, lock, and unlock PDF files directly in-browser.
+- Entrypoint: https://allsettools.com/tools/pdf
+- Popular tools:
+  - Merge PDF: `/tools/merge-pdf`
+  - Split PDF: `/tools/split-pdf`
+  - Lock PDF: `/tools/protect-pdf`
+  - Unlock PDF: `/tools/unlock-pdf`
+
+### 5. SEO Auditing & Generators
+Tag compiling, sitemaps mapping, and metadata analytics.
+- Entrypoint: https://allsettools.com/tools/seo
+- Popular tools:
+  - Schema JSON-LD Generator: `/tools/schema-generator`
+  - Robots.txt Compiler: `/tools/robots-txt-generator`
+  - Sitemap XML Generator: `/tools/sitemap-generator`
+
+### 6. Business Sheets & Financial Calculators
+Marginal models, tax pricing, and invoice outputs.
+- Entrypoint: https://allsettools.com/tools/business
+- Popular tools:
+  - Invoice Creator: `/tools/invoice-generator`
+  - EMI Loan Amortization: `/tools/emi-calculator`
+  - Currency Exchange: `/tools/currency-converter`
+
+### 7. File Utilities
+Archive creations, metadata stripping, and integrity checking.
+- Entrypoint: https://allsettools.com/tools/file
+- Popular tools:
+  - ZIP Creator: `/tools/zip-creator`
+  - File Hash Integrity Checker: `/tools/file-hash-checker`
+  - EXIF Metadata Stripper: `/tools/exif-remover`
+
+### 8. Video & Audio Tools
+Client-side media conversion, compression, and trimming.
+- Entrypoint: https://allsettools.com/tools/video
+- Popular tools:
+  - Video Compressor: `/tools/video-compressor`
+  - Video to GIF: `/tools/video-to-gif`
+  - Voice Recorder & Changer: `/tools/voice-recorder`
+
+### 9. Startup Sheets
+Horizon runway sheets, equity caps, and SaaS models.
+- Entrypoint: https://allsettools.com/tools/startup
+- Popular tools:
+  - SaaS Pricing Sheet: `/tools/saas-pricing-calculator`
+  - Cap Table Generator: `/tools/cap-table-generator`
+
+### 10. Education Utilities
+Reading timers, quiz builders, and citations formats.
+- Entrypoint: https://allsettools.com/tools/education
+- Popular tools:
+  - Citation generator (APA/MLA): `/tools/citation-generator`
+  - Flashcard Generator: `/tools/flashcard-generator`
