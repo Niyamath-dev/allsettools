@@ -692,7 +692,7 @@ export default function ToolClientWrapper({ tool }: WrapperProps) {
         ]
       },
       {
-        "@type": "SoftwareApplication",
+        "@type": "WebApplication",
         "@id": `https://allsettools.com/tools/${tool.id}#software`,
         "name": tool.name,
         "description": tool.description,
