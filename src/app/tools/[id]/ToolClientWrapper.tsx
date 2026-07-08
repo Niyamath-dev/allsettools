@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Tool, getRelatedTools, TOOLS } from '@/lib/registry';
+import { Tool, getRelatedTools, TOOLS, CATEGORIES } from '@/lib/registry';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { Icon } from '@/components/Icons';
 import { toast } from '@/components/Toast';
@@ -577,8 +577,159 @@ export default function ToolClientWrapper({ tool }: WrapperProps) {
   const relatedTools = getRelatedTools(tool);
   const recentTools = TOOLS.filter(t => recentlyUsed.includes(t.id) && t.id !== tool.id).slice(0, 4);
 
+  // Generate SEO content (steps, faqs) for layout and JSON-LD schema
+  const seoData = generateToolSEOContent(tool);
+
+  // Resolve category friendly name
+  const categoryObj = CATEGORIES.find(c => c.id === tool.category);
+  const categoryName = categoryObj ? categoryObj.name : (tool.category.charAt(0).toUpperCase() + tool.category.slice(1) + ' Tools');
+
+  // Map category to schema.org SoftwareApplication category
+  const getApplicationCategory = (cat: string) => {
+    switch (cat) {
+      case 'text':
+      case 'utility':
+      case 'pdf':
+      case 'file':
+      case 'misc':
+        return 'UtilitiesApplication';
+      case 'dev':
+        return 'DeveloperApplication';
+      case 'image':
+      case 'video':
+        return 'MultimediaApplication';
+      case 'seo':
+      case 'business':
+      case 'startup':
+        return 'BusinessApplication';
+      case 'social':
+        return 'SocialNetworkingApplication';
+      case 'education':
+        return 'EducationalApplication';
+      default:
+        return 'UtilitiesApplication';
+    }
+  };
+
+  const appCategory = getApplicationCategory(tool.category);
+
+  // Construct comprehensive JSON-LD schemas
+  const jsonLdGraph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://allsettools.com/#organization",
+        "name": "AllSetTools",
+        "url": "https://allsettools.com",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://allsettools.com/#logo",
+          "url": "https://allsettools.com/ALL%20Set%20Tools%20logo.png",
+          "caption": "AllSetTools Logo"
+        },
+        "image": {
+          "@id": "https://allsettools.com/#logo"
+        },
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://allsettools.com/#website",
+        "url": "https://allsettools.com",
+        "name": "AllSetTools",
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets.",
+        "publisher": {
+          "@id": "https://allsettools.com/#organization"
+        },
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://allsettools.com/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": `https://allsettools.com/tools/${tool.id}#webpage`,
+        "url": `https://allsettools.com/tools/${tool.id}`,
+        "name": tool.name,
+        "description": tool.description,
+        "isPartOf": {
+          "@id": "https://allsettools.com/#website"
+        },
+        "breadcrumb": {
+          "@id": `https://allsettools.com/tools/${tool.id}#breadcrumb`
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `https://allsettools.com/tools/${tool.id}#breadcrumb`,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://allsettools.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": categoryName,
+            "item": `https://allsettools.com/tools/${tool.category}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": tool.name,
+            "item": `https://allsettools.com/tools/${tool.id}`
+          }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": `https://allsettools.com/tools/${tool.id}#software`,
+        "name": tool.name,
+        "description": tool.description,
+        "applicationCategory": appCategory,
+        "operatingSystem": "All",
+        "browserRequirements": "Requires HTML5, Web Browser with JavaScript support.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "publisher": {
+          "@id": "https://allsettools.com/#organization"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `https://allsettools.com/tools/${tool.id}#faq`,
+        "mainEntity": seoData.faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.a
+          }
+        }))
+      }
+    ]
+  };
+
   return (
     <div className="container animate-fade-in" style={{ marginTop: '1rem' }}>
+      {/* JSON-LD Schema Markup Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
+      />
+
       {/* Dynamic Breadcrumbs */}
       <Breadcrumb
         items={[
@@ -602,59 +753,53 @@ export default function ToolClientWrapper({ tool }: WrapperProps) {
           </div>
 
           {/* Dynamic SEO Content: Guide, Examples, and FAQs */}
-          {(() => {
-            const seoData = generateToolSEOContent(tool);
-            return (
-              <div style={{ marginTop: '3.5rem', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-                
-                {/* How-to Guide */}
-                <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem' }}>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', border: 'none', padding: 0 }}>
-                    <Icon name="book-open" style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} />
-                    How to Use {tool.name}
-                  </h2>
-                  <ol style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', paddingLeft: 0, listStyle: 'none' }}>
-                    {seoData.steps.map((step, idx) => (
-                      <li key={idx} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                        <span style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          minWidth: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          backgroundColor: 'var(--color-bg-subtle)',
-                          border: '1px solid var(--color-border)',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          color: 'var(--color-fg)'
-                        }}>{idx + 1}</span>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--color-fg-muted)', margin: 0, paddingTop: '2px', lineHeight: '1.5' }}>{step}</p>
-                      </li>
-                    ))}
-                  </ol>
-                </section>
+          <div style={{ marginTop: '3.5rem', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+            
+            {/* How-to Guide */}
+            <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', border: 'none', padding: 0 }}>
+                <Icon name="book-open" style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} />
+                How to Use {tool.name}
+              </h2>
+              <ol style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', paddingLeft: 0, listStyle: 'none' }}>
+                {seoData.steps.map((step, idx) => (
+                  <li key={idx} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                    <span style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      border: '1px solid var(--color-border)',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      color: 'var(--color-fg)'
+                    }}>{idx + 1}</span>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--color-fg-muted)', margin: 0, paddingTop: '2px', lineHeight: '1.5' }}>{step}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
 
-
-                {/* FAQs */}
-                <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginBottom: '1rem' }}>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', border: 'none', padding: 0 }}>
-                    <Icon name="help-circle" style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} />
-                    FAQs
-                  </h2>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    {seoData.faqs.map((faq, idx) => (
-                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-fg)', border: 'none', padding: 0, margin: 0 }}>{faq.q}</h4>
-                        <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', margin: 0 }}>{faq.a}</p>
-                      </div>
-                    ))}
+            {/* FAQs */}
+            <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2.5rem', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', border: 'none', padding: 0 }}>
+                <Icon name="help-circle" style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} />
+                FAQs
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {seoData.faqs.map((faq, idx) => (
+                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-fg)', border: 'none', padding: 0, margin: 0 }}>{faq.q}</h4>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--color-fg-muted)', lineHeight: '1.6', margin: 0 }}>{faq.a}</p>
                   </div>
-                </section>
-
+                ))}
               </div>
-            );
-          })()}
+            </section>
+
+          </div>
         </div>
 
         {/* RIGHT COLUMN: SIDEBAR */}
