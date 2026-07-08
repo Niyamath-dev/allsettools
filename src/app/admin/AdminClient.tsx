@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { TOOLS } from '@/lib/registry';
 import { toast } from '@/components/Toast';
@@ -18,21 +19,67 @@ interface FeedbackLog {
 
 export default function AdminClient() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<'user' | 'admin'>('user');
   
   // Auth Form State
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
 
   // Dashboard Active Tab
-  const [activeTab, setActiveTab] = useState<'tools' | 'feedback' | 'integrations'>('feedback');
+  const [activeTab, setActiveTab] = useState<'tools' | 'feedback' | 'integrations' | 'registrations'>('feedback');
   
   // Feedback State
   const [feedbacks, setFeedbacks] = useState<FeedbackLog[]>([]);
+
+  // Registrations State
+  interface Registration {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    approved: boolean;
+    created_at: string;
+  }
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
 
   // Google Sheets Integration State
   const [sheetUrl, setSheetUrl] = useState('');
   const [testingContact, setTestingContact] = useState(false);
   const [testingFeedback, setTestingFeedback] = useState(false);
+
+  const fetchRegistrations = async () => {
+    try {
+      const res = await fetch('/api/admin/registrations');
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        setRegistrations(data.registrations || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch registrations:', err);
+    }
+  };
+
+  const handleApproveReject = async (id: string, action: 'approve' | 'reject') => {
+    try {
+      const res = await fetch('/api/admin/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, action }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        toast.success(data.message || 'Operation successful!');
+        fetchRegistrations();
+      } else {
+        toast.error(data.error || 'Failed to execute operation.');
+      }
+    } catch (err) {
+      console.error('Approval operation failed:', err);
+      toast.error('Network error during operation.');
+    }
+  };
 
   // Check login state on mount
   useEffect(() => {
@@ -42,6 +89,10 @@ export default function AdminClient() {
         const data = await res.json().catch(() => ({}));
         if (data.loggedIn) {
           setIsLoggedIn(true);
+          setUserRole(data.role || 'user');
+          if (data.role === 'admin') {
+            fetchRegistrations();
+          }
         }
       } catch (err) {
         console.error('Session check failed:', err);
@@ -80,9 +131,14 @@ export default function AdminClient() {
       });
 
       if (res.ok) {
+        const data = await res.json().catch(() => ({}));
         setIsLoggedIn(true);
-        toast.success('Successfully logged in as Admin!');
+        setUserRole(data.role || 'user');
+        toast.success(`Successfully logged in as ${data.role === 'admin' ? 'Admin' : 'User'}!`);
         setAuthPassword('');
+        if (data.role === 'admin') {
+          fetchRegistrations();
+        }
       } else {
         const errData = await res.json().catch(() => ({}));
         toast.error(errData.error || 'Invalid email or password.');
@@ -226,6 +282,20 @@ export default function AdminClient() {
               Sign In to Console
             </button>
           </form>
+          
+          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'center', fontSize: '0.8125rem', color: 'var(--color-fg-muted)' }}>
+            <div>
+              Need dashboard access?{' '}
+              <Link href="/register" style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+                Register Console Request
+              </Link>
+            </div>
+            <div>
+              <Link href="/forgot-password" style={{ color: 'var(--color-fg-muted)', textDecoration: 'underline' }}>
+                Forgot Password?
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -250,10 +320,15 @@ export default function AdminClient() {
       </div>
 
       {/* Tabs list */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px', marginBottom: '2rem' }}>
-        <button onClick={() => setActiveTab('tools')} className={`btn ${activeTab === 'tools' ? 'btn-primary' : 'btn-secondary'}`}>Tool Manager</button>
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px', marginBottom: '2rem', flexWrap: 'wrap' }}>
         <button onClick={() => setActiveTab('feedback')} className={`btn ${activeTab === 'feedback' ? 'btn-primary' : 'btn-secondary'}`}>User Feedback</button>
-        <button onClick={() => setActiveTab('integrations')} className={`btn ${activeTab === 'integrations' ? 'btn-primary' : 'btn-secondary'}`}>Google Sheets Integration</button>
+        {userRole === 'admin' && (
+          <>
+            <button onClick={() => { setActiveTab('registrations'); fetchRegistrations(); }} className={`btn ${activeTab === 'registrations' ? 'btn-primary' : 'btn-secondary'}`}>Account Signups</button>
+            <button onClick={() => setActiveTab('tools')} className={`btn ${activeTab === 'tools' ? 'btn-primary' : 'btn-secondary'}`}>Tool Manager</button>
+            <button onClick={() => setActiveTab('integrations')} className={`btn ${activeTab === 'integrations' ? 'btn-primary' : 'btn-secondary'}`}>Google Sheets Integration</button>
+          </>
+        )}
       </div>
 
       {/* 2. TOOL MANAGER PANEL */}
@@ -505,6 +580,101 @@ export default function AdminClient() {
                 <p style={{ margin: '4px 0 0 0' }}>Paste the Web App URL into the configuration panel above, click <strong>Save Webhook Settings</strong>, and trigger a <strong>Test Connection</strong> to verify integration.</p>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. ACCOUNT REGISTRATIONS MANAGER */}
+      {activeTab === 'registrations' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="card" style={{ padding: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', border: 'none', padding: 0, margin: '0 0 4px 0' }}>Account Registrations</h3>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--color-fg-muted)', margin: 0 }}>
+                  Approve new requests to enable login access, or revoke existing user privileges.
+                </p>
+              </div>
+              <button onClick={fetchRegistrations} className="btn btn-secondary" style={{ fontSize: '0.8125rem' }}>
+                Refresh Table
+              </button>
+            </div>
+
+            {registrations.length === 0 ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-fg-muted)', fontSize: '0.875rem' }}>
+                No registered accounts found in database. Enable Supabase configurations to accept requests.
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
+                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>Name</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>Email</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>Role</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>Status</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>Registered At</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {registrations.map(reg => (
+                      <tr key={reg.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                        <td style={{ padding: '12px 8px', fontWeight: 500 }}>{reg.name}</td>
+                        <td style={{ padding: '12px 8px', fontFamily: 'var(--font-mono)', fontSize: '0.8125rem' }}>{reg.email}</td>
+                        <td style={{ padding: '12px 8px' }}>
+                          <span style={{
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            backgroundColor: reg.role === 'admin' ? 'rgba(239, 68, 68, 0.1)' : 'var(--color-bg-subtle)',
+                            color: reg.role === 'admin' ? 'var(--color-danger)' : 'var(--color-fg)',
+                            fontSize: '0.75rem',
+                            fontWeight: 600
+                          }}>
+                            {reg.role}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 8px' }}>
+                          <span style={{
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            backgroundColor: reg.approved ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                            color: reg.approved ? 'var(--color-success)' : 'var(--color-warning)',
+                            fontSize: '0.75rem',
+                            fontWeight: 600
+                          }}>
+                            {reg.approved ? 'Approved' : 'Pending Review'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 8px', color: 'var(--color-fg-muted)', fontSize: '0.8125rem' }}>
+                          {new Date(reg.created_at).toLocaleString()}
+                        </td>
+                        <td style={{ padding: '12px 8px', textAlign: 'right' }}>
+                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                            {!reg.approved ? (
+                              <button
+                                onClick={() => handleApproveReject(reg.id, 'approve')}
+                                className="btn btn-primary"
+                                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                              >
+                                Approve
+                              </button>
+                            ) : null}
+                            <button
+                              onClick={() => handleApproveReject(reg.id, 'reject')}
+                              className="btn btn-secondary"
+                              style={{ padding: '4px 10px', fontSize: '0.75rem', color: 'var(--color-danger)' }}
+                            >
+                              {reg.approved ? 'Revoke' : 'Decline'}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}

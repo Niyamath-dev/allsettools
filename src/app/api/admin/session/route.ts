@@ -2,22 +2,19 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
+import { verifySession } from '@/lib/session';
 
 export async function GET() {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@allsettools.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'AdminPass123';
-    
-    // Expected token signature
-    const expectedToken = crypto.createHmac('sha256', adminPassword)
-      .update(adminEmail + '-session-auth-2026')
-      .digest('hex');
-    
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('allsettools_session');
     
-    if (sessionCookie && sessionCookie.value === expectedToken) {
-      return NextResponse.json({ loggedIn: true });
+    if (sessionCookie) {
+      // Check signed DB user session
+      const session = verifySession(sessionCookie.value);
+      if (session) {
+        return NextResponse.json({ loggedIn: true, email: session.email, role: session.role });
+      }
     }
     
     return NextResponse.json({ loggedIn: false });
