@@ -7,6 +7,7 @@ import { encryptPDF } from '@pdfsmaller/pdf-encrypt';
 import { decryptPDF, isEncrypted } from '@pdfsmaller/pdf-decrypt';
 import { toast } from '@/components/Toast';
 import { Icon } from '@/components/Icons';
+import { validateFileConstraints, verifyFileMagicBytes } from '@/lib/fileValidator';
 
 // Helper: Format bytes to human readable size
 const formatBytes = (bytes: number, decimals = 2) => {
@@ -61,9 +62,25 @@ export const ProtectPDF: React.FC = () => {
   const [allowCopying, setAllowCopying] = useState(true);
   const [allowModifying, setAllowModifying] = useState(true);
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      
+      const checkResult = validateFileConstraints(selectedFile, ['pdf'], ['application/pdf'], 30);
+      if (!checkResult.valid) {
+        toast.error(checkResult.error || 'Invalid file size or format.');
+        e.target.value = '';
+        return;
+      }
+
+      const magicCheck = await verifyFileMagicBytes(selectedFile, 'pdf');
+      if (!magicCheck.valid) {
+        toast.error(magicCheck.error || 'Invalid PDF structure.');
+        e.target.value = '';
+        return;
+      }
+
+      setFile(selectedFile);
       setDownloadUrl('');
     }
   };
@@ -234,6 +251,21 @@ export const UnlockPDF: React.FC = () => {
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
+
+      const checkResult = validateFileConstraints(selectedFile, ['pdf'], ['application/pdf'], 30);
+      if (!checkResult.valid) {
+        toast.error(checkResult.error || 'Invalid file size or format.');
+        e.target.value = '';
+        return;
+      }
+
+      const magicCheck = await verifyFileMagicBytes(selectedFile, 'pdf');
+      if (!magicCheck.valid) {
+        toast.error(magicCheck.error || 'Invalid PDF structure.');
+        e.target.value = '';
+        return;
+      }
+
       setFile(selectedFile);
       setDownloadUrl('');
       setPassword('');

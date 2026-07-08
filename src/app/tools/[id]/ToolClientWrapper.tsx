@@ -7,6 +7,7 @@ import { Tool, getRelatedTools, TOOLS, CATEGORIES } from '@/lib/registry';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { Icon } from '@/components/Icons';
 import { toast } from '@/components/Toast';
+import { SecurityBadge } from '@/components/SecurityBadge';
 
 import {
   WordCounter, CharacterCounter, CaseConverter, TextCompare,
@@ -804,6 +805,8 @@ export default function ToolClientWrapper({ tool }: WrapperProps) {
 
         {/* RIGHT COLUMN: SIDEBAR */}
         <aside style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          <SecurityBadge />
           
           {/* Quick Actions Panel */}
           <div className="card" style={{ padding: '1.25rem', gap: '0.75rem' }}>

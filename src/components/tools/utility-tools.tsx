@@ -790,19 +790,19 @@ export const PDFTools: React.FC = () => {
     setConverting(true);
     setProgress(0);
     
+    let currentProgress = 0;
     const interval = setInterval(() => {
-      setProgress(p => {
-        if (p >= 100) {
-          clearInterval(interval);
-          setConverting(false);
-          // Create dummy downloadable blob
-          const blob = new Blob(['Mock converted content'], { type: 'application/octet-stream' });
-          setDownloadUrl(URL.createObjectURL(blob));
-          toast.success('Document converted successfully!');
-          return 100;
-        }
-        return p + 20;
-      });
+      currentProgress += 20;
+      setProgress(currentProgress);
+      
+      if (currentProgress >= 100) {
+        clearInterval(interval);
+        setConverting(false);
+        // Create dummy downloadable blob
+        const blob = new Blob(['Mock converted content'], { type: 'application/octet-stream' });
+        setDownloadUrl(URL.createObjectURL(blob));
+        toast.success('Document converted successfully!');
+      }
     }, 300);
   };
 

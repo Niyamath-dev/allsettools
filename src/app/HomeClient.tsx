@@ -109,8 +109,29 @@ export default function HomeClient() {
     }
   ];
 
+  // FAQ JSON-LD Schema Markup for Homepage
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": "https://allsettools.com/#faq",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
+      }
+    }))
+  };
+
   return (
     <div className="container animate-fade-in" style={{ paddingBottom: '3rem' }}>
+      
+      {/* FAQ Schema Markup Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
 
       {/* 1. HERO BANNER WITH SEARCH */}
       <section className="hero-section">

@@ -72,19 +72,36 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
   ];
 
   // Programmatic SEO JSON-LD schema markup
-  const jsonLd = {
+  const jsonLdGraph = {
     "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": `${category.name} Tools Catalogue`,
-    "description": category.description,
-    "url": `https://allsettools.com/tools/${category.id}`,
-    "numberOfItems": categoryTools.length,
-    "itemListElement": categoryTools.map((t, idx) => ({
-      "@type": "ListItem",
-      "position": idx + 1,
-      "name": t.name,
-      "url": `https://allsettools.com/tools/${t.id}`
-    }))
+    "@graph": [
+      {
+        "@type": "ItemList",
+        "@id": `https://allsettools.com/tools/${category.id}#itemlist`,
+        "name": `${category.name} Tools Catalogue`,
+        "description": category.description,
+        "url": `https://allsettools.com/tools/${category.id}`,
+        "numberOfItems": categoryTools.length,
+        "itemListElement": categoryTools.map((t, idx) => ({
+          "@type": "ListItem",
+          "position": idx + 1,
+          "name": t.name,
+          "url": `https://allsettools.com/tools/${t.id}`
+        }))
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `https://allsettools.com/tools/${category.id}#faq`,
+        "mainEntity": currentFaqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.a
+          }
+        }))
+      }
+    ]
   };
 
   return (
@@ -93,7 +110,7 @@ export default function CategorySEOView({ category }: CategorySEOViewProps) {
       {/* JSON-LD injection */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
       />
 
       <Breadcrumb items={[
