@@ -15,8 +15,88 @@ export default function CategoriesIndexPage() {
     return TOOLS.filter(t => t.category === catId);
   };
 
+  const jsonLdGraph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://allsettools.com/#organization",
+        "name": "AllSetTools",
+        "url": "https://allsettools.com",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://allsettools.com/#logo",
+          "url": "https://allsettools.com/ALL%20Set%20Tools%20logo.png",
+          "caption": "AllSetTools Logo"
+        },
+        "image": {
+          "@id": "https://allsettools.com/#logo"
+        },
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://allsettools.com/#website",
+        "url": "https://allsettools.com",
+        "name": "AllSetTools",
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets.",
+        "publisher": {
+          "@id": "https://allsettools.com/#organization"
+        },
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://allsettools.com/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://allsettools.com/tools#webpage",
+        "url": "https://allsettools.com/tools",
+        "name": "Tools Directories",
+        "description": "Browse the full catalog of free developer tools, text converters, image compressors, SEO checklists, and financial calculators.",
+        "isPartOf": {
+          "@id": "https://allsettools.com/#website"
+        },
+        "breadcrumb": {
+          "@id": "https://allsettools.com/tools#breadcrumb"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://allsettools.com/tools#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://allsettools.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Tools Directories",
+            "item": "https://allsettools.com/tools"
+          }
+        ]
+      }
+    ]
+  };
+
   return (
     <div className="container animate-fade-in" style={{ marginTop: '1rem', paddingBottom: '5rem' }}>
+      
+      {/* JSON-LD Schema Markup Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
+      />
+
       <Breadcrumb items={[{ label: 'Home', url: '/' }, { label: 'All Tools' }]} />
 
       <div style={{ marginBottom: '3rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '2rem' }}>

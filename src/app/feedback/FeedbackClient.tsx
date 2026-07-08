@@ -88,8 +88,125 @@ export default function FeedbackClient() {
     setComment('');
   };
 
+  const jsonLdGraph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://allsettools.com/#organization",
+        "name": "AllSetTools",
+        "url": "https://allsettools.com",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://allsettools.com/#logo",
+          "url": "https://allsettools.com/ALL%20Set%20Tools%20logo.png",
+          "caption": "AllSetTools Logo"
+        },
+        "image": {
+          "@id": "https://allsettools.com/#logo"
+        },
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://allsettools.com/#website",
+        "url": "https://allsettools.com",
+        "name": "AllSetTools",
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets.",
+        "publisher": {
+          "@id": "https://allsettools.com/#organization"
+        },
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://allsettools.com/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://allsettools.com/feedback#webpage",
+        "url": "https://allsettools.com/feedback",
+        "name": "Submit Feedback",
+        "description": "Provide feedback on AllSetTools. Report bugs, suggest new options, or help us prioritize updates for client-side offline utilities.",
+        "isPartOf": {
+          "@id": "https://allsettools.com/#website"
+        },
+        "breadcrumb": {
+          "@id": "https://allsettools.com/feedback#breadcrumb"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://allsettools.com/feedback#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://allsettools.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Submit Feedback",
+            "item": "https://allsettools.com/feedback"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://allsettools.com/feedback#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why should I submit feedback?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Your feedback directly impacts our development pipeline. We use reviews to fix layout bugs, optimize processing scripts, and release new tool sets."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I submit feedback anonymously?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Providing your name and email address is entirely optional. If left blank, your feedback is registered anonymously."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Where is my feedback stored?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Feedback reviews are synced in real-time to your configured Google Sheets spreadsheet via webhook. They are also logged locally inside your browser session database for convenience."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How often do you release updates based on feedback?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We review reports daily and deploy weekly updates to improve tool compatibility, correct minor calculator equations, and optimize styles."
+            }
+          }
+        ]
+      }
+    ]
+  };
+
   return (
     <div className="container animate-fade-in" style={{ marginTop: '1rem' }}>
+      {/* JSON-LD Schema Markup Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
+      />
+
       <Breadcrumb items={[{ label: 'Home', url: '/' }, { label: 'Submit Feedback' }]} />
 
       <div style={{ marginBottom: '2rem' }}>

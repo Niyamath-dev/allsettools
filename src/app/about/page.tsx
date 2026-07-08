@@ -9,8 +9,125 @@ export const metadata = {
 };
 
 export default function AboutPage() {
+  const jsonLdGraph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://allsettools.com/#organization",
+        "name": "AllSetTools",
+        "url": "https://allsettools.com",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://allsettools.com/#logo",
+          "url": "https://allsettools.com/ALL%20Set%20Tools%20logo.png",
+          "caption": "AllSetTools Logo"
+        },
+        "image": {
+          "@id": "https://allsettools.com/#logo"
+        },
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://allsettools.com/#website",
+        "url": "https://allsettools.com",
+        "name": "AllSetTools",
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets.",
+        "publisher": {
+          "@id": "https://allsettools.com/#organization"
+        },
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://allsettools.com/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://allsettools.com/about#webpage",
+        "url": "https://allsettools.com/about",
+        "name": "About Us",
+        "description": "Learn more about AllSetTools, the free all-in-one client-side developer utility platform. Built for privacy, simplicity, and speed.",
+        "isPartOf": {
+          "@id": "https://allsettools.com/#website"
+        },
+        "breadcrumb": {
+          "@id": "https://allsettools.com/about#breadcrumb"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://allsettools.com/about#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://allsettools.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "About Us",
+            "item": "https://allsettools.com/about"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://allsettools.com/about#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the core mission of AllSetTools?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Our mission is to provide developers, designers, and web operators with a secure, high-performance, and completely free utility suite. We believe online formatters, hash calculators, and encoders should never compromise user data privacy or restrict functions behind paywalls or registration forms."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does client-side execution protect my data?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Unlike standard utilities that upload content to remote SQL databases, all calculations on AllSetTools run locally in your browser sandbox using JavaScript. This guarantees that your sensitive API tokens, raw passwords, or binary images never cross the network or get logged on our server logs."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I run the platform offline?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! Because all modules are compiled as static HTML, CSS, and JS code segments, once your browser caches the assets, you can run all formatters, builders, and math calculators fully offline without any active network connection."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is AllSetTools funded if it is entirely free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We maintain AllSetTools through minimal, privacy-compliant developer sponsorships and user donations. This pays for our CDN bandwidth and hosting infrastructure while keeping the platform entirely free of trackers, cookie walls, or annoying full-screen ads."
+            }
+          }
+        ]
+      }
+    ]
+  };
+
   return (
     <div className="container animate-fade-in" style={{ marginTop: '1rem' }}>
+      {/* JSON-LD Schema Markup Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
+      />
+
       <Breadcrumb items={[{ label: 'Home', url: '/' }, { label: 'About Us' }]} />
 
       <div style={{ marginBottom: '2.5rem' }}>

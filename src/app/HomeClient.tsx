@@ -109,28 +109,93 @@ export default function HomeClient() {
     }
   ];
 
-  // FAQ JSON-LD Schema Markup for Homepage
-  const faqSchema = {
+  // Programmatic JSON-LD Schema Markup for Homepage
+  const jsonLdGraph = {
     "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "@id": "https://allsettools.com/#faq",
-    "mainEntity": faqs.map(faq => ({
-      "@type": "Question",
-      "name": faq.q,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.a
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://allsettools.com/#organization",
+        "name": "AllSetTools",
+        "url": "https://allsettools.com",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://allsettools.com/#logo",
+          "url": "https://allsettools.com/ALL%20Set%20Tools%20logo.png",
+          "caption": "AllSetTools Logo"
+        },
+        "image": {
+          "@id": "https://allsettools.com/#logo"
+        },
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://allsettools.com/#website",
+        "url": "https://allsettools.com",
+        "name": "AllSetTools",
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets.",
+        "publisher": {
+          "@id": "https://allsettools.com/#organization"
+        },
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://allsettools.com/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://allsettools.com/#webpage",
+        "url": "https://allsettools.com/",
+        "name": "AllSetTools | Free All-In-One Online Web Tools Platform",
+        "description": "Free, high-performance, and secure online tools. Dev, text, formatting, image compression, AI tag generation, sitemaps, and financial calculators client-side.",
+        "isPartOf": {
+          "@id": "https://allsettools.com/#website"
+        },
+        "breadcrumb": {
+          "@id": "https://allsettools.com/#breadcrumb"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://allsettools.com/#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://allsettools.com/"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://allsettools.com/#faq",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.a
+          }
+        }))
       }
-    }))
+    ]
   };
 
   return (
     <div className="container animate-fade-in" style={{ paddingBottom: '3rem' }}>
       
-      {/* FAQ Schema Markup Injection */}
+      {/* JSON-LD Schema Markup Injection */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
       />
 
       {/* 1. HERO BANNER WITH SEARCH */}

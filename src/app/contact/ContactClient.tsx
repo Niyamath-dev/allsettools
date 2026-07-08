@@ -84,8 +84,125 @@ export default function ContactClient() {
     setMessage('');
   };
 
+  const jsonLdGraph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://allsettools.com/#organization",
+        "name": "AllSetTools",
+        "url": "https://allsettools.com",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://allsettools.com/#logo",
+          "url": "https://allsettools.com/ALL%20Set%20Tools%20logo.png",
+          "caption": "AllSetTools Logo"
+        },
+        "image": {
+          "@id": "https://allsettools.com/#logo"
+        },
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://allsettools.com/#website",
+        "url": "https://allsettools.com",
+        "name": "AllSetTools",
+        "description": "Free 100% offline-ready web utilities and programmatic toolsets.",
+        "publisher": {
+          "@id": "https://allsettools.com/#organization"
+        },
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://allsettools.com/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://allsettools.com/contact#webpage",
+        "url": "https://allsettools.com/contact",
+        "name": "Contact Us",
+        "description": "Get in touch with the AllSetTools team. Request new developer utility tools, report bugs, ask support questions, or contact us for partnership opportunities.",
+        "isPartOf": {
+          "@id": "https://allsettools.com/#website"
+        },
+        "breadcrumb": {
+          "@id": "https://allsettools.com/contact#breadcrumb"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://allsettools.com/contact#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://allsettools.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Contact Us",
+            "item": "https://allsettools.com/contact"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://allsettools.com/contact#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How long does it take to receive a response?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We read every submission and aim to respond to bug reports, custom tool inquiries, and sponsor partnerships within 24 business hours."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I request a custom developer utility?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, absolutely! We prioritize new tools based on user demand. Select 'Custom Tool Request' in the subject dropdown and describe your format specifications."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is there a direct email support line?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, you can write directly to our technical support team at support@allsettools.com for assistance with self-hosting, tools bugs, or sponsorship."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Where are contact submissions logged?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Submissions are automatically synced to your configured Google Sheets spreadsheet via secure API integration. If no integration is active, they are securely saved locally inside your browser session database."
+            }
+          }
+        ]
+      }
+    ]
+  };
+
   return (
     <div className="container animate-fade-in" style={{ marginTop: '1rem' }}>
+      {/* JSON-LD Schema Markup Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
+      />
+
       <Breadcrumb items={[{ label: 'Home', url: '/' }, { label: 'Contact Us' }]} />
 
       <div style={{ marginBottom: '3rem' }}>
