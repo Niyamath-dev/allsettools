@@ -1004,6 +1004,15 @@ export const TOOLS: Tool[] = [
     icon: 'abc'
   },
   {
+    id: 'multi-language-translator',
+    name: 'Multi-Language Translator',
+    description: 'Translate text between multiple languages instantly offline-ready with auto-detection.',
+    category: 'text',
+    keywords: ['translate', 'translator', 'multilingual', 'language converter', 'google translate', 'auto-detect'],
+    icon: 'globe',
+    isTrending: true
+  },
+  {
     id: 'user-agent-parser',
     name: 'User Agent Parser',
     description: 'Parse browser user agent strings to extract OS, engine, browser details, and device category.',

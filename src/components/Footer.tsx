@@ -105,7 +105,7 @@ export const Footer: React.FC = () => {
           <p style={{ fontSize: '0.8125rem', color: 'var(--color-fg-dimmed)', margin: 0, textAlign: 'center' }}>
             © {new Date().getFullYear()} AllSetTools. Handcrafted for privacy. Zero database storage of user inputs.
           </p>
-          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
             <Link href="/privacy" style={{ fontSize: '0.8125rem', color: 'var(--color-fg-dimmed)', textDecoration: 'none' }}>Privacy Policy</Link>
             <Link href="/terms" style={{ fontSize: '0.8125rem', color: 'var(--color-fg-dimmed)', textDecoration: 'none' }}>Terms of Service</Link>
             <Link href="/security" style={{ fontSize: '0.8125rem', color: 'var(--color-fg-dimmed)', textDecoration: 'none' }}>Security Policy</Link>

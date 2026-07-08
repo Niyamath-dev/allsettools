@@ -15,7 +15,7 @@ import {
   RandomTextGenerator, MarkdownEditor, HTMLFormatter, JSONFormatter,
   JSONToCSV, CSVToJSON, Base64ToImage, TextRepeater,
   TextToSpeech, ListRandomizer, ParaphrasingTool, GrammarChecker,
-  HTMLToMarkdown
+  HTMLToMarkdown, MultiLanguageTranslator
 } from '@/components/tools/text-tools';
 
 import {
@@ -351,6 +351,7 @@ export default function ToolClientWrapper({ tool }: WrapperProps) {
       case 'paraphrasing-tool': return <ParaphrasingTool />;
       case 'grammar-checker': return <GrammarChecker />;
       case 'html-to-markdown': return <HTMLToMarkdown />;
+      case 'multi-language-translator': return <MultiLanguageTranslator />;
 
       // Developer Tools
       case 'json-validator': return <JSONValidator />;

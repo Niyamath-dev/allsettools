@@ -1298,5 +1298,669 @@ export const HTMLToMarkdown: React.FC = () => {
   );
 };
 
+// 22. Multi-Language Translator
+export const MultiLanguageTranslator: React.FC = () => {
+  const [text, setText] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
+  const [sourceLang, setSourceLang] = useState('auto');
+  const [targetLang, setTargetLang] = useState('es');
+  const [isLoading, setIsLoading] = useState(false);
+  const [autoTranslate, setAutoTranslate] = useState(true);
+  const [detectedSource, setDetectedSource] = useState('');
+  const [listening, setListening] = useState(false);
+  const [historyList, setHistoryList] = useState<any[]>([]);
+  const recognitionRef = React.useRef<any>(null);
+
+  const SUPPORTED_LANGUAGES = [
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'fr', name: 'French' },
+    { code: 'de', name: 'German' },
+    { code: 'it', name: 'Italian' },
+    { code: 'pt', name: 'Portuguese' },
+    { code: 'nl', name: 'Dutch' },
+    { code: 'pl', name: 'Polish' },
+    { code: 'ru', name: 'Russian' },
+    { code: 'ja', name: 'Japanese' },
+    { code: 'zh-CN', name: 'Chinese (Simplified)' },
+    { code: 'ko', name: 'Korean' },
+    { code: 'ar', name: 'Arabic' },
+    { code: 'hi', name: 'Hindi' },
+    { code: 'tr', name: 'Turkish' },
+    { code: 'vi', name: 'Vietnamese' },
+    { code: 'id', name: 'Indonesian' },
+    { code: 'sv', name: 'Swedish' },
+    { code: 'th', name: 'Thai' },
+    { code: 'uk', name: 'Ukrainian' },
+    { code: 'el', name: 'Greek' },
+    { code: 'he', name: 'Hebrew' },
+    { code: 'la', name: 'Latin' },
+  ];
+
+  const getLanguageName = (code: string) => {
+    const lang = SUPPORTED_LANGUAGES.find(l => l.code === code);
+    return lang ? lang.name : code.toUpperCase();
+  };
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('allsettools_translator_history');
+      if (stored) {
+        setHistoryList(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  // Save history helper
+  const saveToHistory = (srcText: string, trText: string, srcL: string, trL: string) => {
+    try {
+      const stored = localStorage.getItem('allsettools_translator_history');
+      let current: any[] = stored ? JSON.parse(stored) : [];
+      current = current.filter(item => item.text !== srcText);
+      current.unshift({
+        text: srcText,
+        translatedText: trText,
+        sourceLang: srcL,
+        targetLang: trL,
+        timestamp: Date.now()
+      });
+      current = current.slice(0, 5);
+      localStorage.setItem('allsettools_translator_history', JSON.stringify(current));
+      setHistoryList(current);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const clearHistory = () => {
+    try {
+      localStorage.removeItem('allsettools_translator_history');
+      setHistoryList([]);
+      toast.success('History cleared');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const loadHistoryItem = (item: any) => {
+    setSourceLang(item.sourceLang);
+    setTargetLang(item.targetLang);
+    setText(item.text);
+    setTranslatedText(item.translatedText);
+    toast.success('Loaded translation from history');
+  };
+
+  // Perform translation fetch
+  const performTranslation = async () => {
+    const trimmedText = text.trim();
+    if (!trimmedText) {
+      setTranslatedText('');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: trimmedText,
+          from: sourceLang,
+          to: targetLang,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setTranslatedText(data.translatedText);
+        if (sourceLang === 'auto' && data.detectedSource) {
+          setDetectedSource(data.detectedSource);
+        } else {
+          setDetectedSource('');
+        }
+        saveToHistory(trimmedText, data.translatedText, sourceLang, targetLang);
+      } else {
+        toast.error(data.error || 'Failed to translate');
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Translation network error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Debounced translation for "Translate as you type"
+  useEffect(() => {
+    if (!autoTranslate || !text.trim()) {
+      if (!text.trim()) {
+        setTranslatedText('');
+        setDetectedSource('');
+      }
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      performTranslation();
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [text, sourceLang, targetLang, autoTranslate]);
+
+  // Swap languages & contents
+  const swapLanguages = () => {
+    if (sourceLang === 'auto') {
+      const newSource = targetLang;
+      setSourceLang(newSource);
+      setTargetLang('en');
+    } else {
+      const tempLang = sourceLang;
+      setSourceLang(targetLang);
+      setTargetLang(tempLang);
+    }
+    const tempText = text;
+    setText(translatedText);
+    setTranslatedText(tempText);
+  };
+
+  // Speech-to-Text transcription
+  const startListening = () => {
+    if (typeof window === 'undefined') return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error('Speech recognition not supported in this browser.');
+      return;
+    }
+    const rec = new SpeechRecognition();
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.lang = sourceLang !== 'auto' ? sourceLang : 'en-US';
+
+    rec.onstart = () => {
+      setListening(true);
+      toast.success('Listening... speak into your microphone.');
+    };
+
+    rec.onresult = (event: any) => {
+      const resultText = event.results[0][0].transcript;
+      setText(prev => (prev ? prev + ' ' + resultText : resultText));
+    };
+
+    rec.onerror = (e: any) => {
+      const errorType = e && e.error ? e.error : 'unknown';
+      console.warn('Speech recognition warning:', errorType);
+      setListening(false);
+      
+      if (errorType === 'no-speech') {
+        toast.show('No speech was detected.', 'info');
+      } else if (errorType === 'not-allowed') {
+        toast.error('Microphone permission denied. Check your browser settings.');
+      } else if (errorType === 'audio-capture') {
+        toast.error('No microphone found.');
+      } else {
+        toast.error(`Speech recognition error: ${errorType}`);
+      }
+    };
+
+    rec.onend = () => {
+      setListening(false);
+    };
+
+    recognitionRef.current = rec;
+    rec.start();
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+    }
+  };
+
+  // Text-to-Speech synthesis
+  const speak = (textToSpeak: string, langCode: string) => {
+    if (!textToSpeak.trim()) return;
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      toast.error('Speech synthesis not supported in this browser.');
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    const resolvedLang = langCode === 'auto' ? (detectedSource || 'en') : langCode;
+    utterance.lang = resolvedLang;
+    window.speechSynthesis.speak(utterance);
+    toast.success(`Reading aloud...`);
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* Selector and swap header */}
+      <div className="grid-cols-2" style={{ gap: '1.5rem', marginBottom: '-0.75rem', position: 'relative' }}>
+        {/* Source Dropdown */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <label className="label">Translate From</label>
+          <select
+            value={sourceLang}
+            onChange={(e) => {
+              setSourceLang(e.target.value);
+              setDetectedSource('');
+            }}
+            className="input"
+            style={{ appearance: 'auto' }}
+          >
+            <option value="auto">🌐 Auto-Detect Language</option>
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Swap Button (Absolute Positioned between columns on desktop) */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -10%)',
+          zIndex: 10,
+        }} className="hide-on-mobile">
+          <button
+            onClick={swapLanguages}
+            className="btn btn-secondary"
+            title="Swap Languages"
+            style={{
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m16 3 4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Target Dropdown */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <label className="label">Translate To</label>
+          <select
+            value={targetLang}
+            onChange={(e) => setTargetLang(e.target.value)}
+            className="input"
+            style={{ appearance: 'auto' }}
+          >
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Mobile Swap Row */}
+      <div className="show-on-mobile" style={{ display: 'none', justifyContent: 'center', margin: '0.25rem 0' }}>
+        <button
+          onClick={swapLanguages}
+          className="btn btn-secondary"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            borderRadius: '20px',
+            padding: '4px 16px',
+            fontSize: '0.875rem',
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m16 3 4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" />
+          </svg>
+          Swap Languages
+        </button>
+      </div>
+
+      {/* Main Translation Cards Grid */}
+      <div className="grid-cols-2" style={{ gap: '1.5rem' }}>
+        {/* Source Panel */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-fg-muted)' }}>
+              Source Text
+            </span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-fg-muted)' }}>
+              {text.length} / 5,000 chars
+            </span>
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value.slice(0, 5000))}
+              className="input textarea"
+              style={{ height: '220px', resize: 'vertical' }}
+              placeholder="Enter text to translate..."
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '0.25rem' }}>
+            {/* Speech-to-Text Button */}
+            <button
+              onClick={listening ? stopListening : startListening}
+              className={`btn ${listening ? 'btn-primary' : 'btn-secondary'}`}
+              title={listening ? 'Stop listening' : 'Translate from voice (Speech-to-Text)'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0.5rem',
+                minWidth: '38px',
+                height: '38px',
+                position: 'relative',
+              }}
+            >
+              {listening ? (
+                <>
+                  <span style={{
+                    position: 'absolute',
+                    top: '6px',
+                    right: '6px',
+                    width: '8px',
+                    height: '8px',
+                    backgroundColor: '#ef4444',
+                    borderRadius: '50%',
+                    animation: 'pulse 1.5s infinite',
+                  }} />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                    <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6" />
+                    <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                    <line x1="8" y1="23" x2="16" y2="23" />
+                  </svg>
+                </>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" />
+                </svg>
+              )}
+            </button>
+
+            {/* Read Aloud Button */}
+            <button
+              onClick={() => speak(text, sourceLang)}
+              disabled={!text.trim()}
+              className="btn btn-secondary"
+              title="Speak source text (Text-to-Speech)"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', minWidth: '38px', height: '38px' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+            </button>
+
+            {/* Copy Button */}
+            <button
+              onClick={() => {
+                if (!text) return toast.error('Nothing to copy!');
+                navigator.clipboard.writeText(text);
+                toast.success('Source text copied!');
+              }}
+              disabled={!text.trim()}
+              className="btn btn-secondary"
+              title="Copy to clipboard"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', minWidth: '38px', height: '38px' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
+
+            {/* Clear Button */}
+            <button
+              onClick={() => {
+                setText('');
+                setTranslatedText('');
+                setDetectedSource('');
+              }}
+              disabled={!text.trim()}
+              className="btn btn-secondary"
+              title="Clear input"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', minWidth: '38px', height: '38px', marginLeft: 'auto' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Target Panel */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1.25rem', position: 'relative' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-fg-muted)' }}>
+              Translation
+            </span>
+            {detectedSource && (
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--color-success)',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                Detected: {getLanguageName(detectedSource)}
+              </span>
+            )}
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <textarea
+              readOnly
+              value={translatedText}
+              className="input textarea"
+              style={{
+                height: '220px',
+                resize: 'none',
+                backgroundColor: 'var(--color-bg-subtle)',
+              }}
+              placeholder={isLoading ? 'Translating...' : 'Translation will appear here...'}
+            />
+            {isLoading && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(255,255,255,0.4)',
+                  backdropFilter: 'blur(1px)',
+                  borderRadius: '6px',
+                }}
+              >
+                <div style={{
+                  border: '4px solid rgba(0,0,0,0.1)',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  borderLeftColor: 'var(--color-fg)',
+                  animation: 'spin 1s linear infinite'
+                }} />
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '0.25rem' }}>
+            {/* Read Aloud Button */}
+            <button
+              onClick={() => speak(translatedText, targetLang)}
+              disabled={!translatedText.trim()}
+              className="btn btn-secondary"
+              title="Speak translated text (Text-to-Speech)"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', minWidth: '38px', height: '38px' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+            </button>
+
+            {/* Copy Button */}
+            <button
+              onClick={() => {
+                if (!translatedText) return toast.error('Nothing to copy!');
+                navigator.clipboard.writeText(translatedText);
+                toast.success('Translation copied!');
+              }}
+              disabled={!translatedText.trim()}
+              className="btn btn-secondary"
+              title="Copy to clipboard"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', minWidth: '38px', height: '38px' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Options and Manual Translate Action */}
+      <div
+        className="card"
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem 1.25rem',
+          gap: '1rem',
+          backgroundColor: 'var(--color-bg-subtle)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            id="auto-translate"
+            checked={autoTranslate}
+            onChange={(e) => setAutoTranslate(e.target.checked)}
+            style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--color-fg)' }}
+          />
+          <label htmlFor="auto-translate" style={{ fontSize: '0.85rem', cursor: 'pointer', fontWeight: 500 }}>
+            Translate as you type (real-time)
+          </label>
+        </div>
+
+        <button
+          onClick={performTranslation}
+          disabled={isLoading || !text.trim()}
+          className="btn btn-primary"
+          style={{ minWidth: '150px' }}
+        >
+          {isLoading ? 'Translating...' : 'Translate Text'}
+        </button>
+      </div>
+
+      {/* History panel */}
+      {historyList.length > 0 && (
+        <div className="card" style={{ padding: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Translation History</h4>
+            <button
+              onClick={clearHistory}
+              className="btn btn-secondary"
+              style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem', minHeight: 'auto', height: '28px' }}
+            >
+              Clear
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {historyList.map((item, idx) => (
+              <div
+                key={idx}
+                onClick={() => loadHistoryItem(item)}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0.625rem 0.875rem',
+                  borderRadius: '6px',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border)',
+                  cursor: 'pointer',
+                  fontSize: '0.8rem',
+                  transition: 'background-color 0.15s ease',
+                }}
+                className="history-item-hover"
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden', marginRight: '1rem' }}>
+                  <span style={{ fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item.text}
+                  </span>
+                  <span style={{ color: 'var(--color-fg-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item.translatedText}
+                  </span>
+                </div>
+                <div style={{ flexShrink: 0, fontSize: '0.75rem', color: 'var(--color-fg-muted)', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <span>{getLanguageName(item.sourceLang)}</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>{getLanguageName(item.targetLang)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* CSS Styles injection specifically for animations and mobile responsive swap visibility */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.4); opacity: 0.5; }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .history-item-hover:hover {
+          background-color: var(--color-border) !important;
+        }
+        @media (max-width: 768px) {
+          .hide-on-mobile {
+            display: none !important;
+          }
+          .show-on-mobile {
+            display: flex !important;
+          }
+        }
+      `}} />
+    </div>
+  );
+};
+
 
 
