@@ -3,6 +3,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { toast } from '@/components/Toast';
+import { Document as DocxDocument, Packer, Paragraph, TextRun } from 'docx';
+import mammoth from 'mammoth';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 const copyToClipboard = (text: string) => {
   if (!text) return;
@@ -785,25 +788,144 @@ export const PDFTools: React.FC = () => {
     }
   };
 
-  const convert = () => {
+  const loadPdfJS = async (): Promise<any> => {
+    if (typeof window === 'undefined') return null;
+    const pdfjsLib = await import('pdfjs-dist');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+    return pdfjsLib;
+  };
+
+  const convert = async () => {
     if (!file) return;
     setConverting(true);
-    setProgress(0);
-    
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += 20;
-      setProgress(currentProgress);
-      
-      if (currentProgress >= 100) {
-        clearInterval(interval);
-        setConverting(false);
-        // Create dummy downloadable blob
-        const blob = new Blob(['Mock converted content'], { type: 'application/octet-stream' });
+    setProgress(5);
+    setDownloadUrl('');
+
+    try {
+      if (direction === 'pdf-to-word') {
+        setProgress(15);
+        const arrayBuffer = await file.arrayBuffer();
+        
+        setProgress(30);
+        const pdfjsLib = await loadPdfJS();
+        if (!pdfjsLib) {
+          throw new Error('PDF processing library not loaded.');
+        }
+        
+        setProgress(40);
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+        const totalPages = pdf.numPages;
+        
+        let textContent = '';
+        for (let i = 1; i <= totalPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items.map((item: any) => item.str).join(' ');
+          textContent += pageText + '\n\n';
+          setProgress(Math.min(40 + Math.floor((i / totalPages) * 45), 85));
+        }
+
+        setProgress(90);
+        const paragraphs = textContent.split('\n').map(line => {
+          return new Paragraph({
+            children: [new TextRun(line.trim())]
+          });
+        });
+
+        const doc = new DocxDocument({
+          sections: [
+            {
+              properties: {},
+              children: paragraphs
+            }
+          ]
+        });
+
+        const docBuffer = await Packer.toBlob(doc);
+        setDownloadUrl(URL.createObjectURL(docBuffer));
+        setProgress(100);
+        toast.success('Document converted successfully!');
+      } else {
+        setProgress(20);
+        const arrayBuffer = await file.arrayBuffer();
+        
+        setProgress(40);
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        const textContent = result.value;
+
+        if (!textContent.trim()) {
+          throw new Error('No text content found in the Word document.');
+        }
+
+        setProgress(60);
+        const pdfDoc = await PDFDocument.create();
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        
+        const textLines = textContent.split('\n');
+        let page = pdfDoc.addPage();
+        let { width, height } = page.getSize();
+        const margin = 50;
+        const fontSize = 11;
+        const lineHeight = 14;
+        let y = height - margin;
+
+        setProgress(80);
+        for (const line of textLines) {
+          const trimmed = line.trim();
+          if (!trimmed) {
+            y -= lineHeight;
+            if (y < margin) {
+              page = pdfDoc.addPage();
+              y = height - margin;
+            }
+            continue;
+          }
+
+          const words = trimmed.split(/\s+/);
+          let currentLine = '';
+          
+          for (const word of words) {
+            const testLine = currentLine ? `${currentLine} ${word}` : word;
+            const testLineWidth = font.widthOfTextAtSize(testLine, fontSize);
+            
+            if (testLineWidth > width - 2 * margin) {
+              page.drawText(currentLine, { x: margin, y, size: fontSize, font });
+              y -= lineHeight;
+              if (y < margin) {
+                page = pdfDoc.addPage();
+                y = height - margin;
+              }
+              currentLine = word;
+            } else {
+              currentLine = testLine;
+            }
+          }
+          
+          if (currentLine) {
+            page.drawText(currentLine, { x: margin, y, size: fontSize, font });
+            y -= lineHeight;
+            if (y < margin) {
+              page = pdfDoc.addPage();
+              y = height - margin;
+            }
+          }
+        }
+
+        setProgress(95);
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
         setDownloadUrl(URL.createObjectURL(blob));
+        setProgress(100);
         toast.success('Document converted successfully!');
       }
-    }, 300);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Conversion failed. Please try a different file.');
+      setProgress(0);
+    } finally {
+      setConverting(false);
+    }
   };
 
   return (
