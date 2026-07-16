@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import { verifySession } from '@/lib/session';
-import { supabase } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
 
 export async function POST(request: Request) {
@@ -27,22 +27,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Invalid parameters.' }, { status: 400 });
     }
 
-    const isSupabaseConfigured = 
-      (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-      (process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY);
+    const isDbConfigured = !!process.env.DATABASE_URL;
 
-    if (!isSupabaseConfigured) {
-      return NextResponse.json({ success: false, error: 'Supabase database is not configured.' }, { status: 500 });
+    if (!isDbConfigured) {
+      return NextResponse.json({ success: false, error: 'Database is not configured.' }, { status: 500 });
     }
 
     // Fetch user details first
-    const { data: user, error: fetchError } = await supabase
-      .from('registrations')
-      .select('email, name')
-      .eq('id', id)
-      .maybeSingle();
+    let user;
+    try {
+      user = await prisma.registration.findUnique({
+        where: { id },
+        select: { email: true, name: true }
+      });
+    } catch (fetchError) {
+      console.error('Fetch registration error:', fetchError);
+      return NextResponse.json({ success: false, error: 'Database verification error.' }, { status: 500 });
+    }
 
-    if (fetchError || !user) {
+    if (!user) {
       return NextResponse.json({ success: false, error: 'User registration request not found.' }, { status: 404 });
     }
 
@@ -55,12 +58,12 @@ export async function POST(request: Request) {
 
     if (action === 'approve') {
       // Approve user
-      const { error: updateError } = await supabase
-        .from('registrations')
-        .update({ approved: true })
-        .eq('id', id);
-
-      if (updateError) {
+      try {
+        await prisma.registration.update({
+          where: { id },
+          data: { approved: true }
+        });
+      } catch (updateError) {
         console.error('Approve user error:', updateError);
         return NextResponse.json({ success: false, error: 'Failed to approve registration.' }, { status: 500 });
       }
@@ -93,12 +96,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: 'Registration approved successfully.' });
     } else {
       // Reject user (delete request)
-      const { error: deleteError } = await supabase
-        .from('registrations')
-        .delete()
-        .eq('id', id);
-
-      if (deleteError) {
+      try {
+        await prisma.registration.delete({
+          where: { id }
+        });
+      } catch (deleteError) {
         console.error('Delete user request error:', deleteError);
         return NextResponse.json({ success: false, error: 'Failed to reject registration request.' }, { status: 500 });
       }

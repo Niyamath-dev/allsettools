@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import { verifySession } from '@/lib/session';
-import { supabase } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
@@ -21,22 +21,30 @@ export async function GET() {
       return NextResponse.json({ success: false, error: 'Unauthorized: Admin access required.' }, { status: 403 });
     }
 
-    // Return empty list if Supabase is not configured
-    const isSupabaseConfigured = 
-      (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-      (process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY);
+    // Return empty list if DB is not configured
+    const isDbConfigured = !!process.env.DATABASE_URL;
 
-    if (!isSupabaseConfigured) {
+    if (!isDbConfigured) {
       return NextResponse.json({ success: true, registrations: [] });
     }
 
     // Fetch all registration requests
-    const { data: registrations, error: fetchError } = await supabase
-      .from('registrations')
-      .select('id, email, name, role, approved, created_at')
-      .order('created_at', { ascending: false });
-
-    if (fetchError) {
+    let registrations;
+    try {
+      registrations = await prisma.registration.findMany({
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          approved: true,
+          created_at: true
+        },
+        orderBy: {
+          created_at: 'desc'
+        }
+      });
+    } catch (fetchError) {
       console.error('Fetch registrations error:', fetchError);
       return NextResponse.json({ success: false, error: 'Failed to query database.' }, { status: 500 });
     }

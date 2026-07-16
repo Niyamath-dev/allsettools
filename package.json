@@ -11,7 +11,7 @@
   "dependencies": {
     "@pdfsmaller/pdf-decrypt": "^1.0.1",
     "@pdfsmaller/pdf-encrypt": "^1.0.2",
-    "@supabase/supabase-js": "^2.110.1",
+    "@prisma/client": "^6.19.3",
     "@types/js-yaml": "^4.0.9",
     "bootstrap": "^5.3.8",
     "docx": "^9.7.1",
@@ -33,6 +33,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

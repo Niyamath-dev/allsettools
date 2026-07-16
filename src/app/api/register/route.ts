@@ -1,6 +1,6 @@
 // src/app/api/register/route.ts
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/hash';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
 import nodemailer from 'nodemailer';
@@ -62,29 +62,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Password must be between 6 and 128 characters.' }, { status: 400 });
     }
 
-    // 4. Check if email already exists in Supabase
+    // 4. Check if email already exists in Database
     const sanitizedEmail = email.trim().toLowerCase();
 
-    // Safety check: if Supabase is not configured, warn and save in console
-    const isSupabaseConfigured =
-      (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-      (process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY);
+    // Safety check: if Database is not configured, warn
+    const isDbConfigured = !!process.env.DATABASE_URL;
 
-    if (!isSupabaseConfigured) {
+    if (!isDbConfigured) {
       return NextResponse.json(
-        { success: false, error: 'Supabase database is not configured. Setup environment variables to enable registration.' },
+        { success: false, error: 'Database is not configured. Setup environment variables to enable registration.' },
         { status: 500 }
       );
     }
 
-    const { data: existingUser, error: checkError } = await supabase
-      .from('registrations')
-      .select('id')
-      .eq('email', sanitizedEmail)
-      .maybeSingle();
-
-    if (checkError) {
-      console.error('Supabase query error:', checkError);
+    let existingUser;
+    try {
+      existingUser = await prisma.registration.findUnique({
+        where: { email: sanitizedEmail },
+        select: { id: true },
+      });
+    } catch (checkError) {
+      console.error('Database query error:', checkError);
       return NextResponse.json({ success: false, error: 'Database verification failed.' }, { status: 500 });
     }
 
@@ -95,10 +93,8 @@ export async function POST(request: Request) {
     // Check if registrations table is empty to auto-approve first admin
     let isFirstUser = false;
     try {
-      const { count, error: countError } = await supabase
-        .from('registrations')
-        .select('id', { count: 'exact', head: true });
-      if (!countError && count === 0) {
+      const count = await prisma.registration.count();
+      if (count === 0) {
         isFirstUser = true;
       }
     } catch (e) {
@@ -107,19 +103,19 @@ export async function POST(request: Request) {
 
     // 5. Hash Password & Insert
     const { hash, salt } = hashPassword(password);
-    const { error: insertError } = await supabase
-      .from('registrations')
-      .insert({
-        email: sanitizedEmail,
-        password_hash: hash,
-        salt,
-        name: name.trim(),
-        role: isFirstUser ? 'admin' : 'user',
-        approved: isFirstUser ? true : false,
+    try {
+      await prisma.registration.create({
+        data: {
+          email: sanitizedEmail,
+          password_hash: hash,
+          salt,
+          name: name.trim(),
+          role: isFirstUser ? 'admin' : 'user',
+          approved: isFirstUser ? true : false,
+        },
       });
-
-    if (insertError) {
-      console.error('Supabase insert error:', insertError);
+    } catch (insertError) {
+      console.error('Database insert error:', insertError);
       return NextResponse.json({ success: false, error: 'Failed to save registration request.' }, { status: 500 });
     }
 

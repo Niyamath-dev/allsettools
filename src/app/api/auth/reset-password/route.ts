@@ -1,6 +1,6 @@
 // src/app/api/auth/reset-password/route.ts
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/hash';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
@@ -56,23 +56,23 @@ export async function POST(request: Request) {
     const sanitizedEmail = email.trim().toLowerCase();
 
     // 3. Database Check
-    const isSupabaseConfigured = 
-      (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-      (process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY);
+    const isDbConfigured = !!process.env.DATABASE_URL;
 
-    if (!isSupabaseConfigured) {
+    if (!isDbConfigured) {
       return NextResponse.json({ success: false, error: 'Database service not configured.' }, { status: 500 });
     }
 
     // Fetch user with matching email and reset token
-    const { data: user, error: userError } = await supabase
-      .from('registrations')
-      .select('id, reset_token_expires')
-      .eq('email', sanitizedEmail)
-      .eq('reset_token', token)
-      .maybeSingle();
-
-    if (userError) {
+    let user;
+    try {
+      user = await prisma.registration.findFirst({
+        where: {
+          email: sanitizedEmail,
+          reset_token: token,
+        },
+        select: { id: true, reset_token_expires: true },
+      });
+    } catch (userError) {
       console.error('Database query error:', userError);
       return NextResponse.json({ success: false, error: 'Internal database verification failed.' }, { status: 500 });
     }
@@ -94,18 +94,18 @@ export async function POST(request: Request) {
     // 5. Update user password and clear token columns
     const { hash, salt } = hashPassword(newPassword);
 
-    const { error: updateError } = await supabase
-      .from('registrations')
-      .update({
-        password_hash: hash,
-        salt,
-        reset_token: null,
-        reset_token_expires: null
-      })
-      .eq('id', user.id);
-
-    if (updateError) {
-      console.error('Supabase password reset update error:', updateError);
+    try {
+      await prisma.registration.update({
+        where: { id: user.id },
+        data: {
+          password_hash: hash,
+          salt,
+          reset_token: null,
+          reset_token_expires: null
+        }
+      });
+    } catch (updateError) {
+      console.error('Database password reset update error:', updateError);
       return NextResponse.json({ success: false, error: 'Failed to save new password in database.' }, { status: 500 });
     }
 

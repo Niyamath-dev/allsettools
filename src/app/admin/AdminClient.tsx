@@ -602,7 +602,7 @@ export default function AdminClient() {
 
             {registrations.length === 0 ? (
               <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-fg-muted)', fontSize: '0.875rem' }}>
-                No registered accounts found in database. Enable Supabase configurations to accept requests.
+                No registered accounts found in database. Configure the database connection to accept requests.
               </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>

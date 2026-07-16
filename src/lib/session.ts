@@ -1,7 +1,7 @@
 // src/lib/session.ts
 import crypto from 'crypto';
 
-const SESSION_SECRET = process.env.SESSION_SECRET || process.env.SUPABASE_SECRET_KEY || 'fallback-session-secret-key-2026';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'fallback-session-secret-key-2026';
 
 export interface SessionData {
   email: string;

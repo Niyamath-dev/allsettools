@@ -1,7 +1,7 @@
 // prisma/schema.prisma
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -15,7 +15,7 @@ model Feedback {
   email       String?
   tool        String   @default("general")
   rating      Int      @default(5)
-  comment     String
+  comment     String   @db.Text
   submittedAt DateTime @default(now())
 }
 
@@ -29,10 +29,25 @@ model BlogPost {
   id          String   @id @default(uuid())
   slug        String   @unique
   title       String
-  excerpt     String
-  content     String
+  excerpt     String   @db.Text
+  content     String   @db.Text
   category    String
   publishedAt DateTime @default(now())
   readTime    String   @default("5 min read")
   author      String   @default("Administrator")
+}
+
+model Registration {
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  password_hash       String
+  salt                String
+  name                String
+  role                String    @default("user")
+  approved            Boolean   @default(false)
+  reset_token         String?   @db.VarChar(255)
+  reset_token_expires DateTime?
+  created_at          DateTime  @default(now())
+
+  @@map("registrations")
 }

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
-import { supabase } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/hash';
 import { signSession } from '@/lib/session';
 
@@ -62,23 +62,20 @@ export async function POST(request: Request) {
     
     const sanitizedEmail = email.trim().toLowerCase();
 
-    // 4. Try Supabase Registered Users
-    const isSupabaseConfigured = 
-      (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-      (process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY);
+    // 4. Try Registered Users
+    const isDbConfigured = !!process.env.DATABASE_URL;
 
-    if (!isSupabaseConfigured) {
+    if (!isDbConfigured) {
       return NextResponse.json({ success: false, error: 'Invalid email or password.' }, { status: 401 });
     }
 
-    const { data: user, error: dbError } = await supabase
-      .from('registrations')
-      .select('*')
-      .eq('email', sanitizedEmail)
-      .maybeSingle();
-
-    if (dbError) {
-      console.error('Supabase query error during login:', dbError);
+    let user;
+    try {
+      user = await prisma.registration.findUnique({
+        where: { email: sanitizedEmail },
+      });
+    } catch (dbError) {
+      console.error('Database query error during login:', dbError);
       return NextResponse.json({ success: false, error: 'Authentication service error.' }, { status: 500 });
     }
 

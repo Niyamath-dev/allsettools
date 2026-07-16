@@ -1,7 +1,7 @@
 // src/app/api/auth/forgot-password/route.ts
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { supabase } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
 import nodemailer from 'nodemailer';
 
@@ -54,22 +54,20 @@ export async function POST(request: Request) {
     const sanitizedEmail = email.trim().toLowerCase();
 
     // 3. Database Check
-    const isSupabaseConfigured = 
-      (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-      (process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY);
+    const isDbConfigured = !!process.env.DATABASE_URL;
 
-    if (!isSupabaseConfigured) {
+    if (!isDbConfigured) {
       return NextResponse.json({ success: false, error: 'Database service not configured.' }, { status: 500 });
     }
 
     // Verify user exists and is active
-    const { data: user, error: userError } = await supabase
-      .from('registrations')
-      .select('id, name, approved')
-      .eq('email', sanitizedEmail)
-      .maybeSingle();
-
-    if (userError) {
+    let user;
+    try {
+      user = await prisma.registration.findUnique({
+        where: { email: sanitizedEmail },
+        select: { id: true, name: true, approved: true },
+      });
+    } catch (userError) {
       console.error('Database query error:', userError);
       return NextResponse.json({ success: false, error: 'Internal database error.' }, { status: 500 });
     }
@@ -86,18 +84,18 @@ export async function POST(request: Request) {
 
     // 4. Generate Reset Token and Expiration (1 hour)
     const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 3600000).toISOString(); // 1 hour from now
+    const expires = new Date(Date.now() + 3600000);
 
     // 5. Update user row
-    const { error: updateError } = await supabase
-      .from('registrations')
-      .update({
-        reset_token: token,
-        reset_token_expires: expires
-      })
-      .eq('id', user.id);
-
-    if (updateError) {
+    try {
+      await prisma.registration.update({
+        where: { id: user.id },
+        data: {
+          reset_token: token,
+          reset_token_expires: expires,
+        },
+      });
+    } catch (updateError) {
       console.error('Failed to update reset token:', updateError);
       return NextResponse.json({ success: false, error: 'Failed to record reset link.' }, { status: 500 });
     }
